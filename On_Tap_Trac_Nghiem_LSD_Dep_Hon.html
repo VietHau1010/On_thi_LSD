@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ôn Tập & Thi Trắc Nghiệm LSĐ — Giao Diện Hiện Đại</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(15, 23, 42, 0.06)',
+            'glow': '0 8px 25px -4px rgba(79, 70, 229, 0.28)',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .glass-header {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .option-card {
+      transition: transform 0.14s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .option-card:hover:not(.disabled-opt) {
+      transform: translateY(-1px);
+    }
+    .option-card:active:not(.disabled-opt) {
+      transform: scale(0.995);
+    }
+    .opt-selected {
+      border-color: #4f46e5 !important;
+      background-color: rgba(79, 70, 229, 0.08) !important;
+      box-shadow: 0 2px 10px rgba(79, 70, 229, 0.12);
+    }
+    .dark .opt-selected {
+      border-color: #818cf8 !important;
+      background-color: rgba(99, 102, 241, 0.2) !important;
+    }
+    .opt-correct {
+      border-color: #10b981 !important;
+      background-color: rgba(16, 185, 129, 0.12) !important;
+    }
+    .dark .opt-correct {
+      border-color: #34d399 !important;
+      background-color: rgba(16, 185, 129, 0.22) !important;
+    }
+    .opt-wrong {
+      border-color: #f43f5e !important;
+      background-color: rgba(244, 63, 94, 0.11) !important;
+    }
+    .dark .opt-wrong {
+      border-color: #fb7185 !important;
+      background-color: rgba(244, 63, 94, 0.22) !important;
+    }
+    .study-highlight {
+      border-color: #f59e0b !important;
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.92), rgba(253, 230, 138, 0.68)) !important;
+    }
+    .dark .study-highlight {
+      border-color: #fbbf24 !important;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.18)) !important;
+    }
+    .kw-badge {
+      background-color: rgba(79, 70, 229, 0.1);
+      color: #4338ca;
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .dark .kw-badge {
+      background-color: rgba(129, 140, 248, 0.2);
+      color: #c7d2fe;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-view {
+      animation: fadeSlide 0.22s ease-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navbar -->
+  <header class="glass-header bg-white/85 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-40 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-600 text-white font-extrabold flex items-center justify-center text-base shadow-glow">
+          LSĐ
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">Ôn Tập & Thi Trắc Nghiệm</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800">410 câu</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Lịch sử Đảng Cộng sản Việt Nam</p>
+        </div>
+      </div>
+
+      <!-- Right Controls: Mode Switcher + Theme Toggle -->
+      <div class="flex items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
+        <nav class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 overflow-x-auto no-scrollbar">
+          <button onclick="switchMode('study')" id="nav-study" class="nav-btn px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-1.5">
+            <span>📖</span> <span>Đề cương</span>
+          </button>
+          <button onclick="switchMode('practice')" id="nav-practice" class="nav-btn px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-1.5">
+            <span>🎯</span> <span>Luyện tập</span>
+          </button>
+          <button onclick="switchMode('exam')" id="nav-exam" class="nav-btn px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-1.5">
+            <span>⏱️</span> <span>Thi thử 50 câu</span>
+          </button>
+          <button onclick="switchMode('mistakes')" id="nav-mistakes" class="nav-btn px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-1.5">
+            <span>🔖</span> <span>Câu sai</span>
+            <span id="mistake-count" class="px-1.5 py-0.2 rounded-full text-[11px] font-extrabold bg-rose-500 text-white">0</span>
+          </button>
+        </nav>
+
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" title="Chuyển giao diện Sáng / Tối"
+          class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-amber-300 transition shrink-0 shadow-sm">
+          <span id="theme-icon" class="text-base">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== MODE 1: PHẦN HỌC (ĐỀ CƯƠNG) ==================== -->
+    <section id="view-study" class="space-y-5 animate-view">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-base">📖</span>
+              Chế Độ Học Đề Cương & Tra Cứu Nhanh
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Tự động làm nổi bật mốc thời gian, sự kiện quan trọng. Bật chế độ <strong>Che đáp án</strong> để tự nhẩm và bấm vào thẻ câu hỏi để lật mở.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <label class="inline-flex items-center gap-2.5 cursor-pointer bg-amber-50/90 dark:bg-amber-950/40 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-200/80 dark:border-amber-800/60 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-200 select-none transition">
+              <input type="checkbox" id="study-hide-ans" onchange="renderStudy()" class="w-4 h-4 accent-amber-600 rounded">
+              <span>🙈 Che đáp án (Flashcard)</span>
+            </label>
+            <label class="inline-flex items-center gap-2.5 cursor-pointer bg-indigo-50/90 dark:bg-indigo-950/40 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/40 border border-indigo-200/80 dark:border-indigo-800/60 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-indigo-900 dark:text-indigo-200 select-none transition">
+              <input type="checkbox" id="study-only-ans" onchange="renderStudy()" class="w-4 h-4 accent-indigo-600 rounded">
+              <span>✨ Chỉ hiện đáp án đúng</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-5 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+          <div class="flex flex-wrap gap-2" id="study-section-tabs"></div>
+
+          <div class="relative flex-1 max-w-md">
+            <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">🔍</span>
+            <input type="text" id="study-search" oninput="renderStudy()" placeholder="Tìm câu hỏi, năm (1930, 1945...), tên nhân vật..."
+              class="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition">
+            <button onclick="document.getElementById('study-search').value=''; renderStudy();" title="Xóa tìm kiếm"
+              class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm">✕</button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400 flex flex-wrap items-center justify-between gap-2">
+          <span id="study-stats" class="font-medium">Đang hiển thị 0 câu hỏi</span>
+          <span class="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-medium">
+            💡 Mẹo: Khi bật "Che đáp án", bấm vào thẻ câu hỏi bất kỳ để lật đáp án
+          </span>
+        </div>
+      </div>
+
+      <div id="study-list" class="grid grid-cols-1 gap-3.5"></div>
+    </section>
+
+    <!-- ==================== MODE 2: TỰ KIỂM TRA THEO PHẦN ==================== -->
+    <section id="view-practice" class="hidden space-y-5 animate-view">
+      <div id="practice-setup" class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 max-w-3xl mx-auto">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl">
+            🎯
+          </div>
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Cấu Hình Bài Tự Kiểm Tra</h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Chọn chuyên đề, giới hạn khoảng câu và chế độ chấm điểm phù hợp.</p>
+          </div>
+        </div>
+
+        <div class="space-y-6 mt-6">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">1. Chọn chuyên đề ôn tập</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="practice-section-grid"></div>
+          </div>
+
+          <div class="bg-slate-50/80 dark:bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <label class="text-sm font-bold text-slate-800 dark:text-slate-200">2. Phạm vi câu hỏi trong phần đã chọn</label>
+              <label class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 cursor-pointer select-none">
+                <input type="checkbox" id="practice-all-range" checked onchange="togglePracticeRange()" class="w-4 h-4 accent-indigo-600 rounded">
+                <span>Toàn bộ (<span id="practice-max-label">301</span> câu)</span>
+              </label>
+            </div>
+
+            <div id="practice-range-inputs" class="grid grid-cols-2 gap-4 opacity-50 pointer-events-none transition">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Từ câu số:</label>
+                <input type="number" id="practice-from" min="1" value="1" oninput="updatePracticeCountLimit()"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Đến câu số:</label>
+                <input type="number" id="practice-to" min="1" value="10" oninput="updatePracticeCountLimit()"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-1.5">3. Số lượng câu muốn làm</label>
+              <div class="flex gap-2">
+                <input type="number" id="practice-qty" min="1" value="15"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-extrabold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <button type="button" onclick="setPracticeMaxQty()"
+                  class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold whitespace-nowrap transition">
+                  Tối đa
+                </button>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Khả dụng: <strong id="practice-available-qty" class="text-slate-700 dark:text-slate-200">301</strong> câu</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-1.5">4. Chế độ chấm điểm</label>
+              <select id="practice-instant-mode"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="instant">⚡ Chấm & hiện đáp án ngay từng câu</option>
+                <option value="submit">📝 Làm hết rồi mới nộp bài chấm điểm</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-5 pt-1">
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+              <input type="checkbox" id="practice-shuffle-q" checked class="w-4 h-4 accent-indigo-600 rounded">
+              <span>Trộn ngẫu nhiên câu hỏi</span>
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+              <input type="checkbox" id="practice-shuffle-opt" class="w-4 h-4 accent-indigo-600 rounded">
+              <span>Đảo vị trí đáp án A, B, C, D</span>
+            </label>
+          </div>
+
+          <button onclick="startQuiz('practice')"
+            class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-2xl shadow-glow transition-all text-base flex items-center justify-center gap-2">
+            <span>🚀</span> <span>Bắt Đầu Tự Kiểm Tra</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MODE 3: THI THỬ 50 CÂU ==================== -->
+    <section id="view-exam" class="hidden space-y-5 animate-view">
+      <div id="exam-setup" class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-6 sm:p-10 max-w-2xl mx-auto text-center">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-3xl mx-auto mb-5 shadow-glow">
+          ⏱️
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Đề Thi Thử Tổng Hợp (50 Câu)</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2.5 max-w-lg mx-auto leading-relaxed">
+          Mô phỏng phòng thi thật: hệ thống trích ngẫu nhiên <strong class="text-slate-800 dark:text-slate-200">50 câu hỏi</strong> từ ngân hàng chính (301 câu), tính điểm thang 10 và tự động lưu câu sai vào Sổ tay.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left my-7 bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Thời gian làm bài</label>
+            <select id="exam-duration"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="45">45 phút (Chuẩn thi thật)</option>
+              <option value="30">30 phút (Luyện tốc độ)</option>
+              <option value="60">60 phút (Thoải mái)</option>
+              <option value="0">Không giới hạn thời gian</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Thứ tự đáp án</label>
+            <select id="exam-shuffle-opt"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="no">Giữ nguyên A, B, C, D gốc</option>
+              <option value="yes">Đảo ngẫu nhiên A, B, C, D</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="startQuiz('exam')"
+          class="w-full sm:w-auto px-9 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-glow transition-all text-base inline-flex items-center justify-center gap-2">
+          <span>📝</span> <span>Bắt Đầu Làm Đề 50 Câu</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== ACTIVE QUIZ RUNNER ==================== -->
+    <section id="view-quiz-runner" class="hidden space-y-5 animate-view">
+      <!-- Sticky Status & Progress Bar -->
+      <div class="glass-header bg-white/90 dark:bg-slate-900/90 rounded-2xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-4 sticky top-[68px] z-30">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span id="runner-badge" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold tracking-wide bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">TỰ KIỂM TRA</span>
+            <h3 id="runner-title" class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">Đang làm bài...</h3>
+          </div>
+
+          <div class="flex items-center gap-2.5 sm:gap-3.5 ml-auto">
+            <div id="runner-timer-box" class="hidden px-3.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-mono font-extrabold text-sm sm:text-base">
+              ⏱️ <span id="runner-timer">45:00</span>
+            </div>
+            <div class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl">
+              Tiến độ: <span id="runner-answered-count" class="text-indigo-600 dark:text-indigo-400 font-extrabold">0</span>/<span id="runner-total-count">50</span>
+            </div>
+            <button onclick="submitQuiz()" id="btn-submit-quiz"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-sm transition">
+              ✅ Nộp Bài
+            </button>
+            <button onclick="exitQuiz()"
+              class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl text-xs sm:text-sm transition">
+              Thoát
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-3">
+          <div id="runner-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-300 rounded-full" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Result Banner -->
+      <div id="quiz-result-banner" class="hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white rounded-3xl p-6 sm:p-7 shadow-lg">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-3xl shrink-0">
+              🏆
+            </div>
+            <div>
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight" id="result-score-text">Điểm số: 8.50 / 10</h3>
+              <p class="text-emerald-50 text-sm mt-1 font-medium" id="result-detail-text">Đúng 42/50 câu • Sai 8 câu</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="filterResultQuestions('all')" id="filter-res-all" class="px-3.5 py-2 bg-white text-teal-900 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition">Tất cả câu</button>
+            <button onclick="filterResultQuestions('wrong')" id="filter-res-wrong" class="px-3.5 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition">Chỉ xem câu sai</button>
+            <button onclick="retryCurrentQuiz()" class="px-4 py-2 bg-amber-300 hover:bg-amber-200 text-slate-950 rounded-xl text-xs sm:text-sm font-extrabold shadow-sm transition">🔄 Đề mới tương tự</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 items-start">
+        <div id="quiz-questions-container" class="lg:col-span-3 space-y-4"></div>
+
+        <!-- Question Palette Sidebar -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 lg:sticky lg:top-[156px]">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-extrabold text-sm text-slate-800 dark:text-white">Danh sách câu hỏi</h4>
+            <span class="text-[11px] text-slate-400">Bấm số để nhảy tới</span>
+          </div>
+          <div id="quiz-palette" class="grid grid-cols-6 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 max-h-[380px] overflow-y-auto pr-1"></div>
+          <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 grid grid-cols-2 lg:grid-cols-1 gap-1.5">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-indigo-600 inline-block"></span> Đã chọn đáp án</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-amber-400 inline-block"></span> Đánh dấu phân vân</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-emerald-500 inline-block"></span> Trả lời đúng</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-rose-500 inline-block"></span> Trả lời sai</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MODE 4: SỔ TAY CÂU SAI ==================== -->
+    <section id="view-mistakes" class="hidden space-y-5 animate-view">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl">
+            🔖
+          </div>
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">Sổ Tay Các Câu Đã Làm Sai</h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Tự động lưu những câu trả lời sai. Khi luyện lại và làm đúng, câu hỏi sẽ tự động được gỡ khỏi sổ tay.</p>
+          </div>
+        </div>
+        <div class="flex gap-2.5">
+          <button onclick="practiceMistakes()" id="btn-practice-mistakes"
+            class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-glow transition">
+            🎯 Luyện lại các câu sai
+          </button>
+          <button onclick="clearMistakes()"
+            class="px-3.5 py-2.5 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-semibold rounded-xl text-xs sm:text-sm border border-rose-200 dark:border-rose-800/70 transition">
+            🗑️ Xóa hết
+          </button>
+        </div>
+      </div>
+
+      <div id="mistakes-list" class="space-y-3.5"></div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 text-center text-xs text-slate-400 dark:text-slate-500">
+    Hệ thống ôn tập Lịch sử Đảng Cộng sản Việt Nam • Dữ liệu lưu trực tiếp trên trình duyệt của bạn
+  </footer>
+
+  <script>
+    const QUIZ_DATA = {"CAU HOI": [{"stt": "1", "q": "Chọn đáp án đúng nhất. Để xây dựng nền văn hóa tiên tiến, đậm đà bản sắc dân tộc, chúng ta cần phải:", "options": ["Giữ nguyên các truyền thống của dân tộc.", "Tiếp thu nền văn hóa của nhân loại.", "Ngăn chặn sự xâm nhập của văn hóa các nước.", "Kế thừa, phát huy những di sản và truyền thống văn hóa của dân tộc."], "ans": "D"}, {"stt": "2", "q": "Mỹ thực hiện chiến lược Chiến tranh đặc biệt từ năm 1961 có công thức:", "options": ["Chiến lược chiến tranh toàn cầu + Phản ứng linh hoạt.", "Cố vấn, vũ khí Mỹ + Quân chủ lực Việt Nam Cộng hoà.", "Lính thuỷ đánh bộ Mỹ + Quân các nước đồng minh.", "Trực thăng vận + Thiết xa vận + Quân viễn chinh Mỹ."], "ans": "B"}, {"stt": "3", "q": "Chiến dịch Thu Đông 1947 diễn ra trong tổng thời gian:", "options": ["30 ngày đêm.", "75 ngày đêm.", "55 ngày đêm.", "56 ngày đêm."], "ans": "B"}, {"stt": "4", "q": "Pháp tiến hành khai thác thuộc địa lần thứ nhất ở Việt Nam thời gian nào?", "options": ["Từ 1987 đến 1990.", "Từ 1884 đến 1897.", "Từ 1899 đến 1913.", "Từ 1897 đến 1914."], "ans": "D"}, {"stt": "5", "q": "Hội nghị thành lập Đảng Cộng sản Việt Nam diễn ra ở đâu? Thời gian nào?", "options": ["Hồng Kông, từ ngày 06/01 đến 07/02/1930.", "Quảng Châu, từ ngày 06/01 đến 07/02/1930.", "Cao Bằng, từ ngày 06/01 đến 07/02/1930.", "Đại hội đại biểu toàn quốc lần thứ V bầu ai làm Tổng Bí thư của Đảng"], "ans": "A"}, {"stt": "6", "q": "Ban Chấp hành Trung ương Đảng chủ trương “hoãn cách mạng ruộng đất” trong:", "options": ["Hội nghị họp tháng 05/1941.", "Hội nghị họp tháng 06/1936.", "Hội nghị họp tháng 11/1939.", "Hội nghị họp tháng 07/1936."], "ans": "A"}, {"stt": "7", "q": "Đại hội Đảng toàn quốc lần thứ II thông qua văn kiện nào?", "options": ["Cương lĩnh của cách mạng Việt Nam.", "Chính cương của Đảng Lao động Việt Nam.", "Luận cương về cách mạng Việt Nam.", "Cương lĩnh của Đảng Lao động Việt Nam."], "ans": "B"}, {"stt": "8", "q": "Chọn đáp án KHÔNG đúng. Chỉ thị “Kháng chiến kiến quốc” xác định biện pháp giải quyết khó khăn trước mắt:", "options": ["Nhanh chóng bầu cử Quốc hội.", "Thêm bạn bớt thù.", "Nhân nhượng với Pháp.", "Hoa -Việt thân thiện."], "ans": "C"}, {"stt": "9", "q": "Chi bộ Cộng sản đầu tiên gồm mấy đảng viên? Ai làm bí thư chi bộ?", "options": ["7 đảng viên, bí thư Trịnh Đình Cửu.", "7 đảng viên, bí thư Trần Văn Cung.", "7 đảng viên, bí thư Ngô Gia Tự.", "7 đảng viên, bí thư Nguyễn Đức Cảnh."], "ans": "B"}, {"stt": "10", "q": "Chọn đáp án đúng nhất. Những giai cấp bị trị ở Việt Nam dưới chế độ thuộc địa của đế quốc Pháp là:", "options": ["Triều đình phong kiến, nông dân, công nhân, tư sản dân tộc.", "Phong kiến tay sai, nông dân, tư sản dân tộc, công nhân.", "Phong kiến, nông dân, tiểu tư sản, tư sản dân tộc, công nhân.", "Địa chủ, nông dân, tiểu tư sản, tư sản dân tộc, công nhân."], "ans": "D"}, {"stt": "11", "q": "Dưới chế độ thực dân phong kiến, giai cấp nông dân Việt Nam có yêu cầu bức thiết nhất là gì?", "options": ["Ruộng đất cho dân cày.", "Quyền bình đẳng, tự do.", "Độc lập dân tộc, tự do.", "Được giảm tô, giảm tức."], "ans": "A"}, {"stt": "12", "q": "Trong lĩnh vực văn hoá, Pháp thực hiện chính sách nào để cai trị?", "options": ["Ngu dân để dễ cai trị.", "Giữ nguyên chính quyền phong kiến.", "Dùng người Việt cai trị người Việt.", "Giữ nguyên văn hoá phong kiến."], "ans": "A"}, {"stt": "13", "q": "Chọn đáp án đúng nhất, Đảng Cộng sản Việt Nam lấy:", "options": ["Chủ nghĩa Mác – Lênin làm kim chỉ nam cho hành động của Đảng.", "Tư tưởng Hồ Chí Minh làm nền tảng lý luận cho hành động.", "Tự phê bình và phê bình làm nguyên tắc xây dựng cơ bản cho Đảng.", "Tập trung dân chủ làm nguyên tắc tổ chức cơ bản cho Đảng."], "ans": "D"}, {"stt": "14", "q": "Hội nghị thành lập Đảng Cộng sản Việt Nam đã thông qua mấy văn kiện?", "options": ["Ba Văn kiện.", "Năm Văn kiện.", "Sáu Văn kiện.", "Bốn Văn kiện."], "ans": "D"}, {"stt": "15", "q": "Mặt trận dân tộc giải phóng miền Nam Việt Nam do ai làm chủ tịch?", "options": ["Huỳnh Thúc Kháng.", "Văn Hữu Thọ.", "Nguyễn Hữu Thọ.", "Nguyễn Văn Cừ."], "ans": "C"}, {"stt": "16", "q": "Phương pháp cơ bản trong nghiên cứu, học tập khoa học Lịch sử Đảng là gì?", "options": ["Phương pháp so sánh.", "Phương pháp lịch sử.", "Phương pháp tâm lý.", "Phương pháp làm việc nhóm."], "ans": "B"}, {"stt": "17", "q": "Chiến thắng giải phóng Thành cổ Quảng Trị diễn ra trong bao nhiêu ngày đêm?", "options": ["68 ngày đêm, từ ngày 30/03 đến 05/05/1972.", "12 ngày đêm, từ ngày 18/12 đến 30/12/1972.", "81 ngày đêm, từ ngày 28/06 đến 16/09/1972.", "12 ngày đêm, từ ngày 18/12 đến 30/12/1972."], "ans": "C"}, {"stt": "18", "q": "Ai dẫn đầu phái đoàn Việt Nam tham dự Hội nghị Phôngtenơblô?", "options": ["Hồ Chí Minh.", "Nguyễn Thị Kim Ngân.", "Pham Văn Đồng.", "Huỳnh Thúc Kháng."], "ans": "C"}, {"stt": "19", "q": "Chỉ thị “Kháng chiến kiến quốc” xác định nhiệm vụ nào là trung tâm, bao trùm nhất?", "options": ["Chống đế quốc Pháp và địa chủ phong kiến.", "Chống đế quốc Pháp xâm lược lần thứ 2.", "Cải thiện đời sống nhân dân, xoà mù chữ.", "Củng cố, bảo vệ chính quyền cách mạng."], "ans": "D"}, {"stt": "20", "q": "Cơ cấu tổ chức của Chính phủ gồm:", "options": ["Các Bộ, cơ quan ngang Bộ và UBND, HĐND các cấp.", "", "Các Bộ, cơ quan ngang Bộ và Văn phòng Chủ tịch nước do Quốc hội quyết định thành lập theo đề nghị của Thủ tướng Chinh phủ.", "Các cơ quan thuộc Chính phủ, Toà án nhân dân tối cao và Viện kiểm sát nhân dân tối cao."], "ans": ""}, {"stt": "21", "q": "Một trong những phương hướng chung nhằm hoàn thiện các cơ quan nhà nước ta theo hướng nhà nước pháp quyền XHCN là:", "options": ["Không ngừng mở rộng, bảo đảm và bảo vệ các quyền tự do, lợi ích của công dân.", "Kiện toàn tổ chức, đổi mới phương thức và nâng cao hiệu quả hoạt động của Quốc hội.", "Thiết lập mối quan hệ trách nhiệm qua lại giữa công dân với Nhà nước và giữa Nhà nước với công dân.", "Nhà nước pháp quyền Việt Nam đặt dưới sự lãnh đạo của Đảng cộng sản Việt Nam, theo định hướng XHCN."], "ans": "B"}, {"stt": "22", "q": "Hội nghị thành lập Đảng Cộng sản Việt Nam thảo luận mấy điểm lớn mà Nguyễn ái Quốc nêu ra?", "options": ["Năm điểm.", "Các Bộ, cơ quan ngang Bộ do Quốc hội quyết định thành lập theo đề nghị của Thủ tướng Chính phủ.", "Sáu điểm.", "Bảy điểm."], "ans": "A, B"}, {"stt": "23", "q": "Đại hội đại biểu toàn quốc lần thứ V bầu ai làm Tổng Bí thư của Đảng?", "options": ["Lê Duẫn.", "Đỗ Mười.", "Tôn Đức Thắng.", "Trường Chinh."], "ans": "A"}, {"stt": "24", "q": "Từ Hội Việt Nam Cách mạng Thanh niên thành lập nên 2 tổ chức Đảng tên là gì?", "options": ["Đông Dương Cộng sản Liên đoàn, Đông Dương Cộng sản Đảng.", "Đông Dương Cộng sản Liên đoàn, An Nam Cộng sản Đảng.", "Đông Dương Cộng sản Đảng, Tân Việt Cách mạng Đảng.", "Đông Dương Cộng sản Đảng, An Nam Cộng sản Đảng."], "ans": "D"}, {"stt": "25", "q": "Ban Chấp hành trung ương Đảng ra chỉ thị “Kháng chiến kiến quốc” vào thời gian nào?", "options": ["Ngày 26/11/1946.", "Ngày 26/11/1945.", "Ngày 25/11/1946.", "Ngày 25/11/1945."], "ans": "D"}, {"stt": "26", "q": "Chọn đáp án đúng nhất. Thủ tướng Chính phủ có nhiệm vụ, quyền hạn:", "options": ["Củng cố và tăng cường nền an ninh quốc phòng toàn dân, an ninh nhân dân, đảm bảo an ninh quốc gia và trật tự, an toàn xã hội.", "Đình chỉ thi hành hoặc bãi bỏ những quyết định, thông tư của Bộ trưởng, các thành viên khác của Chính phủ, quyết định, chỉ thị của UBND tỉnh trái với Hiến pháp, Luật và các văn bản của cơ quan Nhà nước cấp trên.", "Thống nhất quản lý việc xây dựng, phát triển kinh tế quốc dân, phát triển văn hóa, giáo dục, y tế, khoa học và công nghệ.", "Lãnh đạo công tác của các Bộ, các cơ quan ngang Bộ và các cơ quan thuộc Chính phủ, UBND các cấp, xây dựng và kiện toàn hệ thống thống nhất bộ máy hành chính nhà nước từ Trung ương đến cơ sở."], "ans": "B"}, {"stt": "27", "q": "Chọn đáp án đúng nhất. Tiếp thu những tinh hoa văn hóa nhân loại là:", "options": ["Tiếp thu những cái mới, cái lạ của các nước.", "Tiếp thu những thành tựu khoa học và công nghệ của các nước.", "Tiếp thu những tư tưởng tiến bộ, thành tựu của nhân loại.", "Tiếp thu những tinh hoa về văn hóa và nghệ thuật của nhân loại."], "ans": "C"}, {"stt": "28", "q": "Chọn đáp án KHÔNG đúng. CNH, HDH gắn với phát triển kinh tế tri thức định hướng XHCN giúp cho:", "options": ["Sử dụng hiệu quả mọi nguồn lực cơ bản trong nền kinh tế.", "Khai thác mọi tiềm năng sẵn có của đất nước.", "Tăng nhanh tỷ trọng giá trị sản phẩm và lao động nông nghiệp.", "Khai thác hợp lý nguồn tài nguyên thiên nhiên."], "ans": "C"}, {"stt": "29", "q": "Sự kiện nào đánh dấu “một thời kỳ mới, thời kỳ đấu tranh kịch liệt đã đến”?", "options": ["Cuộc bãi công của công nhân nhà máy xi măng Hải Phòng.", "Tổng bãi công của công nhân khu công nhiệp Bến Thuỷ.", "Cuộc bãi công của công nhân hãng dầu Nhà Bè (Sài gòn).", "Cuộc nổi dậy bằng vũ trang bùng phát tại Yên Bái."], "ans": "B"}, {"stt": "30", "q": "Chọn đáp án KHÔNG đúng. Hội nghị Trung ương 7 (03/2003) ban hành những Nghị quyết quan trọng:", "options": ["Nghị quyết về phát huy sức mạnh đại đoàn kết toàn dân tộc.", "Nghị quyết về công tác tôn giáo.", "Nghị quyết về công tác dân tộc.", "Nghị quyết về công tác giáo dục."], "ans": "D"}, {"stt": "31", "q": "Chính sách đối ngoại của Đảng và Nhà nước ta được thực hiện theo nguyên tắc nào?", "options": ["Bình đẳng, tự do, tự nguyện.", "Tôn trọng, độc lập, tự do, bình đẳng.", "Tôn trọng lẫn nhau, bình đẳng và cùng có lợi.", "Chủ động, tích cực, trách nhiệm."], "ans": "C"}, {"stt": "32", "q": "Đảng ta thực hiện đẩy mạnh công nghiệp hoá, hiện đại hoá trong kỳ Đại hội Đảng:", "options": ["Đại hội đại biểu toàn quốc lần thứ VI (1986).", "Đại hội đại biểu toàn quốc lần thứ VII (1991).", "Đại hội đại biểu toàn quốc lần thứ IX (2001).", "Đại hội đại biểu toàn quốc lần thứ VIII (1996)."], "ans": "D"}, {"stt": "33", "q": "Cao trào cách mạng Việt Nam (1930 – 1931) bắt đầu bị đế quốc Pháp đàn áp khốc liệt từ thời gian nào?", "options": ["Tháng 04/1930.", "Tháng 09/1930.", "Tháng 08/1930.", "Tháng 12/1930."], "ans": "B"}, {"stt": "34", "q": "Do đâu Nguyễn ái Quốc đã triệu tập và chủ trì Hội nghị thành lập Đảng?", "options": ["Được sự uỷ nhiệm của các tổ chức Đảng trong nước.", "Sự chủ động, mong muốn của Nguyễn ái Quốc.", "Sự đòi hỏi khách quan của các phong trào trong nước.", "Nhận được chỉ thị hướng dẫn của Quốc tế Cộng sản."], "ans": "D"}, {"stt": "35", "q": "Đảng ta đã lựa chọn giải pháp gì khi biết Pháp và Tưởng ký hiệp ước Trùng Khánh?", "options": ["Thương lượng hoà bình với Pháp.", "Thương lượng hợp tác với Tưởng.", "Chống cả quân đội Tưởng và Pháp.", "Dàn hoà với quân đội Pháp."], "ans": "D"}, {"stt": "36", "q": "Hội nghị nào đã quyết định phát động toàn dân nổi dậy tổng khởi nghĩa giành chính quyền?", "options": ["Hội nghị Ban Chấp hành Trung ương Đảng.", "Hội nghị Ban Thường vụ Trung ương Đảng.", "Hội nghị toàn quốc của Đảng.", "Hội nghị Tổng bộ Việt Minh."], "ans": "C"}, {"stt": "37", "q": "Tổ chức cộng sản Đảng đầu tiên ở Việt Nam được thành lập ở đâu?", "options": ["Khánh Hội, Tp.Hồ Chí Minh.", "Khánh Hội, Sài Gòn.", "Khâm Thiên, Hà Nội.", "Đức Thọ, Hà Tĩnh."], "ans": "C"}, {"stt": "38", "q": "Tác phẩm “Lịch sử nước ta”, được Hồ Chí Minh viết vào thời gian nào?", "options": ["Năm 1925.", "Năm 1969.", "Năm 1947.", "Năm 1942."], "ans": "D"}, {"stt": "39", "q": "Ngày 04/12/1953, tại kỳ họp thứ 3, Quốc hội Khoá I đã thông qua văn kiện nào?", "options": ["Luật cải cách ruộng đất.", "Cương lĩnh ruộng đất.", "Mức địa tô, thuế đất mới.", "Chính sách về ruộng đất."], "ans": "A"}, {"stt": "40", "q": "Văn kiện nào của Đảng Cộng sản Việt Nam đặt nhiệm vụ chống đế quốc lên hàng đầu?", "options": ["Luận cương chính trị tháng 10/1930 (Dự án để thảo luận).", "Chánh cương vắn tắt; Sách lược vắn tắt của Đảng (02/1930).", "Thư của Trung ương gửi cho các cấp Đảng bộ (12/1930).", "Nghị quyết Đại hội toàn quốc lần thứ nhất của Đảng (03/1935)."], "ans": "B"}, {"stt": "41", "q": "Phương châm đối ngoại mà Đảng xác định trong giai đoạn 1996 - 2011 là gì?", "options": ["Chủ động, tích cực hội nhập kinh tế quốc tế.", "Đa phương hoá, đa dạng hoá quan hệ đối ngoại, hội nhập kinh tế quốc tế.", "Mở rộng quan hệ quốc tế, hợp tác nhiều mặt với các nước, các trung tâm kinh tế, chính trị khu vực và quốc tế.", "Chủ động hội nhập kinh tế quốc tế và khu vực theotinh thần phát huy tối đa nội lực."], "ans": "A"}, {"stt": "42", "q": "\"Có nền văn hoá tiên tiến, đậm đà bản sắc dân tộc\" thể hiện nội dung nào của CNXH mà nước ta đang xây dựng?", "options": ["Chính sách.", "Tính chất.", "Nội dung.", "Đặc trưng."], "ans": "D"}, {"stt": "43", "q": "Quy luật riêng của cách mạng Việt Nam được Đảng Cộng sản Việt Nam khẳng định trong:", "options": ["Văn kiện Đại hội đại biểu toàn quốc lần thứ XII.", "Văn kiện Đại hội đại biểu toàn quốc lần thứ XI.", "Văn kiện Đại hội đại biểu toàn quốc lần thứ VIII.", "Văn kiện Đại hội đại biểu toàn quốc lần thứ VII."], "ans": "A"}, {"stt": "44", "q": "Thời gian và địa điểm diễn ra Đại hội Đảng toàn quốc lần thứ II là gì?", "options": ["Tháng 03/1935, tại Ma Cao, Trung Quốc.", "Tháng 02/1951, tại Chiêm Hoá - Tuyên Quang.", "Tháng 02/1950, tại Tân Trào - Tuyên Quang.", "Tháng 03/1951, tại Pắc pó – Cao Bằng."], "ans": "B"}, {"stt": "45", "q": "Đảng xác định mối quan hệ ngoại giao giữa Việt Nam, Lào, Campudia trong giai đoạn 1976 - 1985 là gì?", "options": ["Mối quan hệ đặc biệt.", "Mối quan hệ anh em.", "Mối quan hệ đa phương hợp tác cùng phát triển.", "Mối quan hệ hữu nghị, hợp tác."], "ans": "A"}, {"stt": "46", "q": "Vào cuối thế kỉ XX, xu thế đối ngoại chung của thế giới là gì?", "options": ["Mối quan hệ đặc biệt.", "Cạnh tranh, xung đột.", "Chạy đua phát triển kinh tế.", "Đối đầu, thù địch."], "ans": "A"}, {"stt": "47", "q": "Chọn đáp án KHÔNG đúng. Khó khăn, thách thức của Việt Nam sau Cách mạng tháng Tám năm 1945:", "options": ["Các thế lực đế quốc, phản động bao vây, chống phá.", "Hơn 90% dân số Việt Nam không biết chữ.", "Kinh tế Việt Nam kiệt quệ và nạn đói hoành hành.", "Tất cả các trường học trong tình trạng đóng cửa."], "ans": "D"}, {"stt": "48", "q": "Hiến pháp đầu tiên của nước Việt Nam Dân chủ Cộng hoà được thông qua vào:", "options": ["Ngày 09/11/1946.", "Ngày 09/11/1945.", "Ngày 10/10/1946.", "Ngày 10/10/1945."], "ans": "A"}, {"stt": "49", "q": "Hội nghị lần thứ nhất Ban Chấp hành Trung ương bầu ai làm Tổng Bí thư?", "options": ["Hồ Chí Minh.", "Trần Phú.", "Hà Huy Tập.", "Lê Hồng Phong."], "ans": "B"}, {"stt": "50", "q": "Nghiên cứu, học tập lịch sử Đảng để nêu cao hiểu biết về công tác xây dựng Đảng trong các thời kỳ lịch sử về lĩnh vực:", "options": ["Chính trị, tư tưởng, tổ chức và đạo đức.", "Chính trị, văn hoá, xã hội và đạo đức.", "Chính trị, quân sự, văn hoá và xã hội.", "Chính trị, xã hội, kinh tế và văn hoá."], "ans": "A"}, {"stt": "51", "q": "Trong giai đoạn 1986 - 1996, Đảng xác định đường lối đối ngoại của Việt Nam là gì?", "options": ["Đa phương hoá, đa dạng hoá quan hệ đối ngoại.", "Độc lập, tự chủ, đa phương hoá, đa dạng hoá quan hệ đối ngoại.", "Đa phương hoá, đa dạng hoá quan hệ đối ngoại, hội nhập kinh tế quốc tế.", "Đa phương hoá, đa dạng hoá quan hệ đối ngoại, hội nhập quốc tế."], "ans": "B"}, {"stt": "52", "q": "Nguyên nhân quyết định sự bùng nổ và phát triển của cao trào cách mạng Việt Nam 1930 – 1931 là:", "options": ["Chính sách khủng bố nặng nề của đế quốc Pháp.", "Chính sách tăng cường vơ vét bóc lột của đế quốc Pháp.", "Sự lãnh đạo của Đảng Cộng sản Đông Dương.", "Tác động của cuộc khủng hoảng kinh tế 1929 – 1933."], "ans": "C"}, {"stt": "53", "q": "Đại hội đại biểu toàn quốc lần thứ V của Đảng diễn ra trong thời gian nào?", "options": ["Từ ngày 27/03 đến 31/03/1981, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1976, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1982, tại Hà Nội.", "Từ ngày 27/03 đến 31/03/1982, tại Hà Nội."], "ans": "D"}, {"stt": "54", "q": "Chọn đáp án KHÔNG đúng. Để khắc phục hạn chế, sai lầm trong đường lối xây dựng CNXH, Đảng ra:", "options": ["Quyết định số 24-CP (10/1979) về tận dụng đất nông nghiệp khai hoang.", "Chỉ thị số 100-CT/TW (01/1981) về khoán sản phẩm đến người lao động.", "Quyết định số 25-CP (01/1981) về quyền chủ động sản xuất, kinh doanh.", "Quyết định số 26-CP (01/1981) về trả lương theo sản phẩm, lương khoán."], "ans": "A"}, {"stt": "55", "q": "Thành quả lớn nhất của chiến dịch Thu Đông 1947 mà Đảng ta đạt được là gì?", "options": ["Tiêu diệt 7000 tên địch, phá huỷ hàng trăm xe, đánh chìm 16 ca nô.", "Bảo toàn được cơ quan đầu não và căn cứ địa kháng chiến.", "Lực lượng vũ trang ta được tôi luyện và trưởng thành.", "Đánh bại âm mưu đánh nhanh, thắng nhanh của Pháp."], "ans": "B"}, {"stt": "56", "q": "Trong chiến tranh ở Việt Nam, Mỹ đã sử dụng bao nhiêu chiến lược chiến tranh?", "options": ["Bốn chiến lược.", "Ba chiến lược.", "Hai chiến lược.", "Năm chiến lược."], "ans": "A"}, {"stt": "57", "q": "Đại hội đại biểu lần thứ nhất của Đảng diễn ra thời gian nào? Ở đâu?", "options": ["Tháng 12/1930, Hương Cảng (Trung Quốc).", "Tháng 03/1935, Ma Cao (Trung Quốc).", "Tháng 02/1934, Hồng Kông (Trung Quốc).", "Tháng 05/1933, Quảng Châu (Trung Quốc)."], "ans": "B"}, {"stt": "58", "q": "Cương lĩnh đầu tiên của Đảng đã xác định mục tiêu chiến lược của cách mạng Việt Nam là gì?", "options": ["Chủ trương làm tư sản dân quyền cách mạng và thổ địa cách mạng để đi tới xã hội cộng sản.", "Làm một cuộc cách mạng tư sản dân quyền, giành độc lập dân tộc tiến lên xã hội cộng sản.", "Cách mạng tư sản dân quyền, lập chính quyền của công nông để dự bị điều kiện đi tới XHCN.", "Xây dựng một nước Việt Nam dân giàu, nước mạnh, xã hội công bằng, dân chủ và văn minh."], "ans": "A"}, {"stt": "59", "q": "Đại hội IV nhận thức mới về đặc trưng CNXH ở Việt Nam, là những đặc trưng nào?", "options": ["Chế độ làm chủ tập thể, nền sản xuất lớn, nền văn hoá mới, con người mới XHCN.", "Chế độ do nhân dân lao động làm chủ, xây dựng CNXH là sự nghiệp của toàn dân.", "Nền kinh tế phát triển cao, khoa học kỹ thuật phát triển, giáo dục đào tạo chú trọng.", "Chế độ chuyên chính vô sản, phát huy quyền làm chủ tập thể của nhân dân lao động."], "ans": "A"}, {"stt": "60", "q": "Đường lối cách mạng xã hội chủ nghĩa ở miền Bắc được thông qua tại:", "options": ["Hội nghị lần thứ nhất (Khoá III).", "Hội nghị lần thứ bảy (Khoá II).", "Hội nghị lần thứ mười (Khoá II).", "Đại hội đại biểu toàn quốc lần thứ III."], "ans": "D"}, {"stt": "61", "q": "Chọn đáp án KHÔNG đúng. Đại hội VI đặc biệt chú trọng chương trình kinh tế lớn:", "options": ["Phát triển hàng thương hiệu.", "Sản xuất hàng tiêu dùng.", "Lương thực, thực phẩm.", "Sản xuất hàng xuất khẩu."], "ans": "A"}, {"stt": "62", "q": "Thời gian ra bản Tuyên đạt nêu rõ việc thành lập Đông Dương Cộng sản liên đoàn?", "options": ["Tháng 09/1929.", "Tháng 11/1929.", "Tháng 10/1929.", "Tháng 12/1929."], "ans": "A"}, {"stt": "63", "q": "Dưới chế độ phong kiến, xã hội Việt Nam có mấy giai cấp cơ bản?", "options": ["Hai giai cấp: Phong kiến; Nông dân.", "Hai giai cấp: Nông dân; Địa chủ.", "Hai giai cấp: Phong kiến; Nhân dân.", "Hai giai cấp: Phú nông; Bần nông."], "ans": "B"}, {"stt": "64", "q": "Ngày kỷ niệm ra đời Đảng Cộng sản Việt Nam được Hồ Chí Minh chọn là ngày:", "options": ["Ngày 06/01/1930.", "Ngày 02/03/1930.", "Ngày 07/02/1930.", "Ngày 03/02/1930."], "ans": "D"}, {"stt": "65", "q": "Đại hội nào của Đảng được gọi là Đại hội “Trí tuệ, đổi mới, dân chủ, kỷ cương và đoàn kết”?", "options": ["Đại hội VII.", "Đại hội VI.", "Đại hội VIII.", "Đại hội XII."], "ans": "A"}, {"stt": "66", "q": "Phong trào mà Đảng ta đã vận động nhân dân chống nạn mù chữ là gì?", "options": ["Xây dựng văn hoá mới.", "Mở cửa các trường dạy học.", "Bình dân học vụ.", "Bài trừ các tệ nạn xã hội."], "ans": "C"}, {"stt": "67", "q": "Đảng ta thực hiện đẩy mạnh CNH, HĐH và hội nhập quốc tế trong kỳ Đại hội Đảng lần thứ mấy?", "options": ["Đại hội đại biểu toàn quốc lần thứ VIII (1986).", "Đại hội đại biểu toàn quốc lần thứ IX (1991).", "Đại hội đại biểu toàn quốc lần thứ IX (2001).", "Đại hội đại biểu toàn quốc lần thứ VIII (1996)."], "ans": "D"}, {"stt": "68", "q": "Đảng ta đã phát động phong trào gì để ủng hộ nhân lực cho Nam Bộ kháng chiến?", "options": ["Nam tiến.", "Miền Nam ruột thịt.", "Thành đồng Tổ quốc.", "Miền Nam máu thịt."], "ans": "A"}, {"stt": "69", "q": "Cao trào đòi trả tự do cho cụ Phan Bội Châu diễn ra sôi nổi thời gian nào?", "options": ["Tháng 06/1925.", "Tháng 08/1925.", "Tháng 12/1925.", "Tháng 11/1925."], "ans": "C"}, {"stt": "70", "q": "Nội dung nào là đặc điểm cơ quan Nhà nước?", "options": ["Tính không vụ lợi.", "Tính lệ thuộc vào chính trị và hệ thống chính trị.", "Tính dân chủ.", "Tính quyền lực Nhà nước."], "ans": "D"}, {"stt": "71", "q": "Việt Nam đặt quan hệ ngoại giao với Trung Quốc, Liên Xô vào thời gian nào?", "options": ["Trung Quốc (18/01/1950); Liên Xô (30/01/1950).", "Trung Quốc (01/01/1950); Liên Xô (05/01/1950).", "Trung Quốc (18/02/1950); Liên Xô (30/02/1950).", "Trung Quốc (01/03/1950); Liên Xô (05/03/1950)."], "ans": "A"}, {"stt": "72", "q": "Nguyễn ái Quốc viết Báo cáo gửi Quốc tế Cộng sản về việc thành lập Đảng Cộng sản Việt Nam vào thời gian nào?", "options": ["Ngày 18/02/1930.", "Ngày 08/02/1930.", "Ngày 24/02/1930.", "Ngày 28/02/1930."], "ans": "A"}, {"stt": "73", "q": "Để phá kế hoạch phong toả của tướng Rơve, Đảng quyết định mở chiến dịch tiến công quy mô lớn. Đó là:", "options": ["Chiến dịch Biên giới Thu Đông.", "Chiến dịch Tây Bắc Thu Đông.", "Chiến dịch Việt Bắc Thu Đông.", "Chiến dịch Biên giới thượng Lào."], "ans": "A"}, {"stt": "74", "q": "Đại hội đại biểu toàn quốc lần thứ III của Đảng diễn ra trong thời gian nào?", "options": ["Tháng 06/1960, tại Cao Bằng.", "Tháng 09/1960, tại Hà Nội.", "Tháng 10/1960, tại Hà Nội.", "Tháng 11/1960, tại Hà Tây."], "ans": "B"}, {"stt": "75", "q": "Phong trào “Vô sản hoá” do Hội Việt Nam Cách mạng Thanh niên (Bắc kỳ) phát động từ thời gian nào?", "options": ["Ngày 26/06/1926.", "Ngày 28/09/1927.", "Ngày 29/09/1929.", "Ngày 29/09/1928."], "ans": "D"}, {"stt": "76", "q": "Tổ chức cộng sản Đảng đầu tiên ở Việt Nam do ai làm bí thư?", "options": ["Bí thư Trần Văn Cung.", "Bí thư Trịnh Đình Cửu.", "Bí thư Ngô Gia Tự.", "Bí thư Nguyễn Đức Cảnh."], "ans": "B"}, {"stt": "77", "q": "“Chúng ta có quyền tự hào về bản chất tốt đẹp, truyền thống anh hùng và lịch sử vẻ vang của Đảng ta…”, được trích trong:", "options": ["Nghị quyết Trung ương 4 khoá XII (30/10/2016).", "Nghị quyết Trung ương 4 khoá XII (14/10/2016).", "Nghị quyết Trung ương 5 khoá XII (05/05/2017).", "Nghị quyết Trung ương 5 khoá XII (10/05/2017)."], "ans": "A"}, {"stt": "78", "q": "Mỹ phải chấp nhận cuộc đàm phán với Chính phủ nước Việt Nam Dân chủ Cộng hoà vào thời gian nào? Ở đâu?", "options": ["Tháng 05/1968, tại Paris.", "Tháng 08/1968, tại Versey.", "Tháng 01/1969, tại Paris.", "Tháng 01/1969, tại Geneve."], "ans": "C"}, {"stt": "79", "q": "Chọn đáp án KHÔNG đúng. Thành tựu căn bản trong xây dựng, củng cố chính quyền cách mạng sau 1945:", "options": ["Củng cố và mở rộng mặt trận dân tộc thống nhất.", "Tổng tuyển cử bầu ra Quốc Hội và ban hành Hiến pháp.", "Giải quyết được nạn đói, nạn mù chữ cho người dân.", "Xây dựng và phát triển các lực lượng vũ trang nhân dân."], "ans": "C"}, {"stt": "80", "q": "Bước đột phá thứ hai trong Hội nghị Trung ương 8 (Khoá V – 06/1985) là gì?", "options": ["Xoá bỏ kinh tế thị trường tư bản ở miền Nam.", "Thực hành tiết kiệm, giải quyết việc làm cho dân.", "Xoá bỏ cơ chế tập trung, quan liêu, bao cấp.", "Điều tiết giá, lương, tiền theo cơ chế thị trường."], "ans": "C"}, {"stt": "81", "q": "Đại hội VII nhận thức xã hội XHCN mà nhân dân ta xây dựng có bao nhiêu đặc trưng?", "options": ["Bốn đặc trưng.", "Bảy đặc trưng.", "Sáu đặc trưng.", "Tám đặc trưng."], "ans": "C"}, {"stt": "82", "q": "Hội nghị nào xác định kế hoạch năm 1985 tiếp tục coi trọng nông nghiệp?", "options": ["Hội nghị Trung ương 7 (Khoá V – 12/1984).", "Hội nghị Trung ương 6 (Khoá V – 07/1984).", "Hội nghị Trung ương 8 (Khoá V – 06/1985).", "Hội nghị Trung ương 9 (Khoá V – 12/1985)."], "ans": "A"}, {"stt": "83", "q": "Đại hội đại biểu toàn quốc lần thứ IV của Đảng diễn ra trong thời gian nào?", "options": ["Từ ngày 14/12 đến 20/12/1976, tại Hà Nội.", "Từ ngày 08/12 đến 14/12/1975, tại Hà Nội.", "Từ ngày 26/04 đến 30/04/1976, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1975, tại Hà Nội."], "ans": "A"}, {"stt": "84", "q": "Con đường cách mạng Việt Nam được Đảng ta xác định tại Đại hội II là gì?", "options": ["Con đường cách mạng vô sản.", "Cách mạng tư sản dân quyền.", "Con đường cách mạng bạo lực.", "Cách mạng dân tộc, dân chủ, nhân dân."], "ans": "D"}, {"stt": "85", "q": "Hội nghị Phôngtenơblô diễn ra vào thời gian nào? Ở đâu?", "options": ["Từ ngày 15/06 đến 25/09/1946, tại Paris.", "Từ ngày 12/08 đến 10/10/1946, tại Paris.", "Từ ngày 06/07 đến 10/09/1946, tại Versey.", "Từ ngày 10/09 đến 30/10/1946, tại Versey."], "ans": "C"}, {"stt": "86", "q": "Chọn đáp án KHÔNG đúng. Hội nghị thành lập Đảng qui định điều kiện vào Đảng là:", "options": ["Tin theo chủ nghĩa cộng sản.", "Tin theo chương trình đảng.", "Có Đảng viên giới thiệu.", "Phục tùng mệnh lệnh Đảng."], "ans": "C"}, {"stt": "87", "q": "Tác hại nào của cơ chế tập trung quan liêu, bao cấp làm cho đất nước nghèo đi, kinh tế khủng hoảng?", "options": ["Không tạo được dòng lực phát triển.", "Làm giảm năng suất, chất lượng, hiệu quả.", "Thúc đẩy sản xuất.", "Phục tùng mệnh lệnh Đảng."], "ans": "B"}, {"stt": "88", "q": "Lịch sử Đảng Cộng sản Việt Nam giáo dục lý tưởng cách mạng với mục tiêu chiến lược là:", "options": ["Giải phóng dân tộc khỏi ách cai trị của đế quốc.", "Độc lập dân tộc với dân giàu, nước mạnh.", "Độc lập dân tộc với phát triển kinh tế, xã hội.", "Độc lập dân tộc và chủ nghĩa xã hội."], "ans": "D"}, {"stt": "89", "q": "Chọn đáp án đúng nhất. Trong nội dung và định hướng CNH, HĐH gắn với phát triển kinh tế tri thức, Đại hôi X đã chỉ rõ:", "options": ["Phải coi kinh tế tri thức là yếu tố cơ bản của nền kinh tế và CNH, HĐH.", "Phải coi kinh tế tri thức là yếu tố trung tâm của nền kinh tế và CNH, HĐH.", "Phải coi kinh tế tri thức là yếu tố quan trọng của nền kinh tế và CNH, HĐH.", "Phải coi kinh tế tri thức là yếu tố hàng đầu của nền kinh tế và CNH, HĐH."], "ans": "C"}, {"stt": "90", "q": "Quân đội giải phóng miền Nam Việt Nam ra đời vào thời gian nào?", "options": ["Ngày 20/12/1960.", "Ngày 22/12/1960.", "Ngày 20/12/1961.", "Ngày 15/02/1961."], "ans": "D"}, {"stt": "91", "q": "Đảng lãnh đạo cách mạng giải phóng dân tộc, xây dựng và phát triển đất nước bằng:", "options": ["Sự lãnh đạo tài tình, sáng suốt; sự đoàn kết toàn dân.", "Tiên phong, gương mẫu trong tổ chức, hành động.", "Chủ trương, chính sách đúng đắn trong từng thời kỳ.", "Cương lĩnh, đường lối, chủ trương, chính sách lớn."], "ans": "D"}, {"stt": "92", "q": "Ý nghĩa, vai trò sự ra đời của tổ chức Quốc tế Cộng sản đối với thế giới là gì?", "options": ["Nơi tập hợp các thành viên cộng sản và truyền bá chủ nghĩa Mác – Lênin.", "Tổ chức viện trợ quân sự, vũ khí cho các phong trào cách mạng vô sản.", "Bộ tham mưu chiến đấu, tổ chức lãnh đạo phong trào cách mạng vô sản.", "Tổ chức đi đầu hướng dẫn xây dựng hệ thống CNXH đối trọng với CNTB."], "ans": "C"}, {"stt": "93", "q": "Đảng đề ra chủ trương Hoàn thành thống nhất nước nhà về mặt nhà nước trong:", "options": ["Hội nghị Trung ương 24 (Khoá III – 08/1975).", "Hội nghị Trung ương 23 (Khoá III – 12/1974).", "Hội nghị Trung ương 24 (Khoá IV – 05/1976).", "Hội nghị Trung ương 25 (Khoá III – 09/1975)."], "ans": "A"}, {"stt": "94", "q": "Chọn đáp án đúng nhất. Đẩy mạnh hoạt động kinh tế đối ngoại là nhằm:", "options": ["Tích cực tham gia vào các diễn đàn và hoạt động của thế giới.", "Sẵn sàng đối thoại với các nước về vấn đề kinh tế.", "Mở rộng hợp tác về kinh tế.", "Phát huy nội lực, nâng cao hiệu quả hợp tác quốc tế."], "ans": "D"}, {"stt": "95", "q": "Chuyển biến quan trọng ở các nước tư bản Âu-Mỹ ảnh hưởng đến cách mạng Việt Nam là gì?", "options": ["Chủ nghĩa tư bản phương Tây chuyển nhanh sang giai đoạn xuất khẩu tư bản.", "Chủ nghĩa tư bản phương Tây chuyển từ tự do cạnh tranh sang độc quyền.", "Chủ nghĩa tư bản phương Tây chuyển nhanh sang giai đoạn xâm chiếm thuộc địa.", "Chủ nghĩa tư bản tăng cường khai thác thuộc địa, nhanh chóng chạy đua vũ trang."], "ans": "B"}, {"stt": "96", "q": "Khối liên minh nhân dân 3 nước Việt, Lào, Campuchia được thành lập thời gian nào?", "options": ["Tháng 02/1951.", "Tháng 05/1951.", "Tháng 04/1951.", "Tháng 03/1951."], "ans": "D"}, {"stt": "97", "q": "Đại diện cho trào lưu dân chủ tiểu tư sản là:", "options": ["Đảng dân chủ lập hiến.", "Việt Nam Quốc dân đảng.", "Việt Nam Quang phục hội.", "Việt Nam Nghĩa đoàn."], "ans": "B"}, {"stt": "98", "q": "Nhiệm vụ chính của cách mạng Việt Nam trong báo cáo tại Đại hội Đảng toàn quốc lần thứ II là gì?", "options": ["Tập trung đấu tranh chống xâm lược, hoàn thành công cuộc giải phóng dân tộc.", "Tập trung khởi nghĩa vũ trang giành chính quyền thật sự về tay người Việt Nam.", "Xoá bỏ những di tích phong kiến và nửa phong kiến, làm cho người cày có ruộng.", "Phát triển chế độ dân chủ nhân dân, gây cơ sở tiến lên xây dựng chủ nghĩa xã hội."], "ans": "A"}, {"stt": "99", "q": "Cao trào kháng Nhật, cứu nước diễn ra vùng rừng núi, trung du Bắc kỳ với hình thức nào là chủ yếu?", "options": ["Chiến tranh du kích cục bộ.", "Khởi nghĩa từng phần.", "Vũ trang tuyên truyền.", "Đấu tranh báo chí."], "ans": "A"}, {"stt": "100", "q": "Chi bộ Cộng sản đầu tiên ở Việt Nam được thành lập vào thời gian nào?", "options": ["Tháng 06/1929.", "Tháng 05/1929.", "Tháng 03/1930.", "Tháng 04/1929."], "ans": "C"}, {"stt": "101", "q": "Chọn đáp án KHÔNG đúng. Tính chất của xã hội Việt Nam trong báo cáo tại Đại hội Đảng toàn quốc lần thứ II:", "options": ["Xã hội chủ nghĩa.", "Một phần thuộc địa.", "Nửa phong kiến.", "Dân chủ nhân dân."], "ans": "A"}, {"stt": "102", "q": "Quốc hội đầu tiên của nước Việt Nam Dân chủ Cộng hoà được bầu ra khi nào?", "options": ["Ngày 01/01/1946.", "Ngày 02/02/1946.", "Ngày 05/01/1946.", "Ngày 06/01/1946."], "ans": "D"}, {"stt": "103", "q": "Bộ môn khoa học Lịch sử Đảng Cộng sản Việt Nam được chỉ đạo biên soạn giáo trình từ thời gian nào?", "options": ["Ngày 10/07/1986.", "Ngày 20/07/1990.", "Ngày 27/07/1991.", "Ngày 13/07/1992."], "ans": "D"}, {"stt": "104", "q": "Chọn đáp án KHÔNG đúng. Phương châm đường lối kháng chiến chống Pháp là:", "options": ["Đánh thắng những nơi chắc thắng.", "Kháng chiến toàn diện.", "Lâu dài, dựa vào sức mình là chính.", "Kháng chiến toàn dân."], "ans": "A"}, {"stt": "105", "q": "Hội nghị Ban Thường vụ Trung Đảng họp mở rộng tại Làng Vạn Phúc họp vào thời gian nào?", "options": ["Ngày 16/12/1946.", "Ngày 17/12/1946.", "Ngày 19/12/1946.", "Ngày 18/12/1946."], "ans": "D"}, {"stt": "106", "q": "Bốn tỉnh giành chính quyền sớm nhất trong cuộc tổng khởi nghĩa giành chính quyền 1945 là:", "options": ["Hải Dương, Bắc Giang, Hà Tĩnh, Quảng Nam.", "Bắc Ninh, Hải Dương, Ninh Bình, Cao Bằng.", "Hà Nội, Hải Dương, Quảng Nam, Quảng Trị.", "Hải Dương, Hải Phòng, Hà Tĩnh, Quảng Nam."], "ans": "A"}, {"stt": "107", "q": "Trong quá trình xây dựng hệ thống chính quyền thuộc địa, Pháp thực hiện chính sách nào nhằm phá vỡ khối đại đoàn kết dân tộc?", "options": ["Dùng người Việt cai trị người Việt.", "Ngu dân để dễ cai trị.", "Chia để trị, chia ba kỳ.", "Dùng chính quyền phong kiến tay sai."], "ans": "C"}, {"stt": "108", "q": "Kẻ thù chính của cách mạng Việt Nam ngay sau Cách mạng tháng Tám năm 1945 là:", "options": ["20 vạn quân Tưởng Giới Thạch và tay sai.", "2 vạn quân đội Anh – Ấn và tay sai.", "Thực dân Pháp xâm lược lần thứ 2.", "2 triệu người chết đói, hơn 90% mù chữ."], "ans": "C"}, {"stt": "109", "q": "Tổ chức Quốc tế Cộng sản do ai đứng đầu thành lập?", "options": ["Ph.Ăngghen.", "C.Mác.", "V.I.Lênin.", "I.V.Stalin."], "ans": "C"}, {"stt": "110", "q": "Để thúc đẩy cuộc kháng chiến tiến lên, ngày 27/03/1948, Ban Thường vụ Trung ương Đảng ra chỉ thị:", "options": ["Chống âm mưu dùng người Việt đánh người Việt.", "Chống âm mưu lấy chiến tranh nuôi chiến tranh.", "Tiến hành chiến tranh du kích trên cả nước.", "Phát động phong trào Thi đua ái quốc."], "ans": "D"}, {"stt": "111", "q": "Mặt trận dân tộc giải phóng miền Nam Việt Nam ra đời vào thời gian nào?", "options": ["20/12/1960.", "22/12/1944.", "15/02/1961.", "20/12/1958."], "ans": "A"}, {"stt": "112", "q": "Chọn đáp án KHÔNG đúng. Đối tượng nghiên cứu của khoa học Lịch sử Đảng:", "options": ["Sự kiện lịch sử gắn trực tiếp với sự lãnh đạo Đảng.", "Chủ nghĩa Mác – Lênin và tư tưởng Hồ Chí Minh.", "Cương lĩnh, đường lối, chủ trương của Đảng.", "Quá trình chỉ đạo, tổ chức thực tiễn của Đảng."], "ans": "B"}, {"stt": "113", "q": "Tên của tổ chức có nòng cốt là Cộng sản đoàn được thành lập vào 06/1925 là gì?", "options": ["Hội Việt Nam Cách mạng Thanh niên.", "Việt Nam Thanh niên cách mạng đồng chí Hội.", "Hội Việt Nam cách mạng độc lập đồng minh.", "Hội Việt Nam cách mạng đồng chí Hội."], "ans": "A"}, {"stt": "114", "q": "Chọn đáp án KHÔNG đúng. Đặc điểm ra đời của giai cấp công nhân Việt Nam là gì?", "options": ["Chịu áp bức của đế quốc, tư sản.", "Chủ yếu xuất thân từ nông dân.", "Lực lượng ban đầu nhỏ bé.", "Chủ yếu khai thác mỏ, đồn điền."], "ans": "A"}, {"stt": "115", "q": "Những điều kiện về tư tưởng, lý luận, chính trị và tổ chức để thành lập Đảng được thể hiện rõ trong tác phẩm nào?", "options": ["Đường lối Cách mạng.", "Luận cương chính trị.", "Cương lĩnh chính trị.", "Đường kách mệnh."], "ans": "D"}, {"stt": "116", "q": "Đại hội đại biểu toàn quốc lần thứ XII của Đảng là Đại hội:", "options": ["Trí tuệ, đổi mới, dân chủ, kỷ cương và đoàn kết.", "Đổi mới, dân chủ, kỷ cương và đoàn kết.", "Đoàn kết, dân chủ, kỷ cương, đổi mới.", "Đoàn kết, trí tuệ, đổi mới, dân chủ, kỷ cương."], "ans": "C"}, {"stt": "117", "q": "Chọn đáp án đúng nhất. Đại hội đại biểu toàn quốc lần thứ II quyết định:", "options": ["Thống nhất Đảng của giai cấp công nhân của 3 nước Việt, Lào, Campuchia.", "Đưa Đảng của giai cấp công nhân các nước ra hoạt động công khai.", "Giai cấp công nhân của mỗi nước tự thành một Đảng lãnh đạo riêng.", "Thành lập mặt trận dân tộc chung thống nhất giữa 3 nước chống Pháp."], "ans": "C"}, {"stt": "118", "q": "Đảng và Nhà nước ta coi trọng việc bảo tồn, tôn tạo các di tích lịch sử, di sản văn hóa của đất nước là việc làm thể hiện:", "options": ["Tạo điều kiện để nhân dân được tham gia các hoạt động văn hóa.", "Kế thừa, phát huy những di sản và truyền thống văn hóa của dân tộc.", "Giữ nguyên các di sản và truyền thống văn hóa của dân tộc.", "Bảo vệ những gì thuộc về dân tộc."], "ans": "B"}, {"stt": "119", "q": "Tên của lực lượng vũ trang được thành lập ở Nghệ Tĩnh trong cao trào cách mạng 1930 – 1931 là gì?", "options": ["Tự vệ đỏ.", "Cứu quốc quân.", "Du kích sông La.", "Tự vệ chiến đấu."], "ans": "A"}, {"stt": "120", "q": "Hội nghị Trung ương 21 (Khoá III – 07/1973), xác định con đường cách mạng của nhân dân miền Nam là gì?", "options": ["Đấu tranh chính trị thực hiện Hiệp định chấm dứt chiến tranh.", "Giành quyền làm chủ, phát triển thực lực cách mạng chủ yếu.", "Nắm vững thời cơ, giữ vững đường lối chiến lược hoà bình.", "Đấu tranh bạo lực cách mạng, giữ vững đường lối tiến công."], "ans": "D"}, {"stt": "121", "q": "Tổ chức An Nam Cộng sản Đảng được thành lập ở đâu?", "options": ["Khâm Thiên, Hà Nội.", "Khánh Hội, Tp.Hồ Chí Minh.", "Khánh Hội, Sài Gòn.", "Đức Thọ, Hà Tĩnh."], "ans": "C"}, {"stt": "122", "q": "Nội dung nào sau đây nằm trong Cương lĩnh chính trị đầu tiên của Đảng?", "options": ["Tư sản dân quyền cách mạng là thời kỳ dự bị để làm xã hội cách mạng.", "Đánh đế quốc và bọn phong kiến, làm cho nước Nam hoàn toàn độc lập.", "Chỉ có giải phóng giai cấp vô sản thì mới giải phóng hoàn toàn dân tộc.", "Đảng lãnh đạo có vững, thì cách mạng giải phóng dân tộc mới thành công."], "ans": "B"}, {"stt": "123", "q": "Tổng Bí thư Trần Phú hy sinh thời gian nào? Ở đâu?", "options": ["Ngày 28/05/1931, tại Chợ An Đông (Sài Gòn).", "Ngày 11/04/1931, tại Chợ Bến Thành (Sài Gòn).", "Ngày 18/04/1931, tại Chợ Tân Định (Sài Gòn).", "Ngày 06/09/1931, tại Chợ quán (Sài Gòn)."], "ans": "D"}, {"stt": "124", "q": "Phương pháp cơ bản trong nghiên cứu, học tập của sinh viên đối với khoa học Lịch sử Đảng là gì?", "options": ["Phương pháp làm việc nhóm.", "Phương pháp so sánh.", "Phương pháp logic.", "Phương pháp lịch sử."], "ans": "A"}, {"stt": "125", "q": "Hiệp định sơ bộ được Hồ Chí Minh ký với Jean Sainteny vào thời gian nào?", "options": ["Ngày 06/03/1946.", "Ngày 04/03/1946.", "Ngày 05/03/1946.", "Ngày 03/03/1946."], "ans": "A"}, {"stt": "126", "q": "Tình hình đất nước ta sau Cách mạng tháng Tám năm 1945 được ví như hình ảnh:", "options": ["Ngàn cân treo sợi tóc.", "Nước sôi lửa bỏng.", "Sợi tóc treo ngàn cân.", "Nước sôi lửa nóng."], "ans": "A"}, {"stt": "127", "q": "Khái niệm Tư tưởng Hồ Chí Minh được đưa ra trong kỳ Đại hội nào của Đảng?", "options": ["Đại hội đại biểu toàn quốc lần thứ VIII (1996).", "Đại hội đại biểu toàn quốc lần thứ X (2006).", "Đại hội đại biểu toàn quốc lần thứ IX (2001).", "Đại hội đại biểu toàn quốc lần thứ XI (2011)."], "ans": "C"}, {"stt": "128", "q": "Chọn đáp án đúng nhất. Thường trực HĐND có nhiệm vụ, quyền hạn:", "options": ["Bảo đảm an ninh, trật tự, an toàn xã hội, thực hiện nhiệm vụ xây dựng lực lượng vũ trang và xây dựng quốc phòng toàn dân.", "Tổ chức và chỉ đạo công tác thi hành án ở địa phương.", "Phòng chống thiên tai, bảo vệ tài sản của nhà nước và của công dân, chống tham nhũng, buôn lậu, làm hàng giả và các tệ nạn xã hội khác.", "Đôn đốc, kiểm tra UBND cùng các cơ quan nhà nước khác ở địa phương."], "ans": "D"}, {"stt": "129", "q": "Đại hội đại biểu toàn quốc lần thứ IV bầu ai làm Tổng Bí thư của Đảng?", "options": ["Nguyễn Lương Bằng.", "Phạm Văn Đồng.", "Lê Duẫn.", "Nguyễn Văn Linh."], "ans": "C"}, {"stt": "130", "q": "Đâu là nơi được coi là căn cứ địa cách mạng của cả nước trong kháng chiến chống Pháp năm 1947?", "options": ["Tây Bắc.", "Điện Biên Phủ.", "Hà Nội.", "Việt Bắc."], "ans": "D"}, {"stt": "131", "q": "Chỉ thị “Kháng chiến kiến quốc” xác định khẩu hiệu cách mạng Việt Nam lúc này là:", "options": ["Dân tộc trên hết, Tổ quốc trên hết.", "Thành lập chính quyền cách mạng.", "Xoá giặc đói, diệt giặc dốt.", "Đoàn kết dân tộc đuổi giặc ngoại xâm."], "ans": "A"}, {"stt": "132", "q": "Chọn đáp án KHÔNG đúng. Khuyết điểm trong Đại hội V là:", "options": ["Chưa xác định những quan điểm kết hợp kế hoạch với thị trường.", "Chưa thấy được việc cần thiết phải duy trì kinh tế nhiều thành phần.", "Chưa thấy được việc cần thiết phải sử dụng kinh tế thị trường.", "Chưa xác định quan điểm kết hợp quản lý lưu thông, phân phối."], "ans": "C"}, {"stt": "133", "q": "Trụ sở hoạt động của tổ chức có nòng cốt là Cộng sản đoàn được thành lập vào 06/1925 là ở đâu?", "options": ["Thượng Hải.", "Triều Châu.", "Quảng Châu.", "Cao Bằng."], "ans": "C"}, {"stt": "134", "q": "Hội nghị lần thứ 8 Ban chấp hành Trung ương Đảng nhấn mạnh nhiệm vụ nào là bức thiết nhất?", "options": ["Giải phóng dân tộc.", "Giải phóng giai cấp.", "Giải phóng con người.", "Giải phóng dân cày."], "ans": "A"}, {"stt": "135", "q": "Chọn đáp án KHÔNG đúng. Nhiệm vụ của khoa học Lịch sử Đảng:", "options": ["Vận dụng bài học kinh nghiệm trong đấu tranh cách mạng.", "Tái hiện tiến trình lịch sử lãnh đạo, đấu tranh của Đảng.", "Tổng kết từng chặng đường và suốt tiến trình lịch sử của Đảng.", "Trình bày có hệ thống Cương lĩnh, đường lối của Đảng."], "ans": "A"}, {"stt": "136", "q": "Chọn đáp án đúng nhất:", "options": ["Đảng Cộng sản Việt Nam do Chủ tịch Hồ Chí Minh sáng lập ra.", "Đảng Cộng sản Việt Nam do Chủ tịch Hồ Chí Minh sáng tạo ra.", "Đảng Cộng sản Việt Nam do Chủ tịch Hồ Chí Minh thành lập ra.", "Đảng Cộng sản Việt Nam do một mình Hồ Chí Minh sáng lập ra."], "ans": "A"}, {"stt": "137", "q": "Lý luận chân chính của Đảng theo Hồ Chí Minh là gì?", "options": ["Đem thực tế trong lịch sử, trong kinh nghiệm, trong đấu tranh, xem xét, so sánh thật kỹ lưỡng, rõ ràng làm thành kết luận.", "Đem thực tế trong lịch sử, trong các cuộc tranh đấu, xem xét, so sánh thật kỹ lưỡng, rõ ràng làm thành kết luận.", "Đem thực tế trong lịch sử, trong kinh nghiệm, xem xét kỹ, rõ ràng làm thành kết luận. Rồi đem nó chứng minh với thực tế.", "Đem thực tế trong lịch sử, trong kinh nghiệm, trong đấu tranh, xem xét, so sánh thật kỹ lưỡng, rõ ràng đúc kết thành lý luận."], "ans": "C"}, {"stt": "138", "q": "Chọn đáp án đúng nhất. Đại hội VI của Đảng được đánh giá là:", "options": ["Đại hội mở ra thời đại mới cho cách mạng Việt Nam.", "Đại hội đánh dấu bước ngoặt thay đổi lớn cho kinh tế.", "Đại hội khởi xướng đường lối đổi mới toàn diện.", "Đại hội đánh dấu thời kì đổi mới tư duy."], "ans": "C"}, {"stt": "139", "q": "Để đối phó với cuộc tấn công của Pháp lên căn cứ địa cách mạng của cả nước, Ban Thường vụ Trung ương Đảng đã đề ra:", "options": ["Chủ trương Tiến công quân Pháp ở vùng sau lưng chúng.", "Lời kêu gọi Đánh tan cuộc tấn công của thực dân Pháp.", "Chỉ thị Phá tan cuộc tấn công mùa Đông của giặc Pháp.", "Lời kêu gọi Tất cả vì tổ quốc quyết sinh, tiến lên, tiến lên!"], "ans": "C"}, {"stt": "140", "q": "Sau chiến dịch Điện Biên Phủ kết thúc, Hội nghị chấm dứt chiến tranh Đông Dương bắt đầu thời gian nào? Ở đâu?", "options": ["Ngày 07/05/1954, tại Paris – Pháp.", "Ngày 08/05/1954, tại Geneve – Thuỵ Sỹ.", "Ngày 19/07/1954, tại Versey – Pháp.", "Ngày 08/05/1954, tại Geneve – Pháp."], "ans": "B"}, {"stt": "141", "q": "Chọn đáp án đúng nhất. Chính sách đối ngoại có vai trò:", "options": ["Tạo điều kiện quốc tế thuận lợi cho công cuộc đổi mới đất nước.", "Đẩy mạnh phát triển kinh tế - xã hội.", "Nâng cao vị thế nước ta trên thế giới.", "Xây dựng và bảo vệ Tổ quốc."], "ans": "C"}, {"stt": "142", "q": "Phong trào Cần Vương diễn ra trong thời gian nào?", "options": ["Từ 1858 đến 1868.", "Từ 1885 đến 1896.", "Từ 1868 đến 1898.", "Từ 1896 đến 1911."], "ans": "B"}, {"stt": "143", "q": "Trong kháng chiến chống Pháp, Đảng ta đã chủ trương mở rộng mặt trận dân tộc thống nhất bằng việc:", "options": ["Mở rộng Việt Minh và Liên Việt.", "Mở rộng Mặt trận Việt Minh.", "Mở rộng mặt trân Liên Việt.", "Thành lập Mặt trận Liên Việt."], "ans": "D"}, {"stt": "144", "q": "Nhiệm vụ rất quan trọng của khoa học Lịch sử Đảng là gì?", "options": ["Trình bày có hệ thống Cương lĩnh, đường lối của Đảng.", "Vận dụng bài học kinh nghiệm trong đấu tranh cách mạng.", "Tổng kết từng chặng đường và suốt tiến trình lịch sử của Đảng.", "Tái hiện tiến trình lịch sử lãnh đạo, đấu tranh của Đảng."], "ans": "D"}, {"stt": "145", "q": "Quan điểm của nước ta trong chính sách đối ngoại là:", "options": ["Hợp tác, dân chủ, văn minh và tiến bộ.", "Đoàn kết, hợp tác, công bằng và bình đẳng.", "Hợp tác, công bằng, dân chủ và văn minh.", "Đoàn kết hữu nghị, hợp tác và bình đẳng."], "ans": "D"}, {"stt": "146", "q": "Chính quyền Xô viết ở một số vùng nông thôn Nghệ Tĩnh được thành lập trong thời gian nào?", "options": ["Đầu năm 1930.", "Giữa năm 1930.", "Cuối năm 1930.", "Đầu năm 1931."], "ans": "C"}, {"stt": "147", "q": "Chọn đáp án đúng nhất. Hệ thống chính trị ở Việt Nam có:", "options": ["Đảng cộng sản Việt Nam là Trung tâm của hệ thống chính trị.", "Nhà nước Cộng hoà XHCN Việt Nam là tổ chức trung tâm thực hiện quyền lực chính trị, là trụ cột của hệ thống chính trị.", "Mặt trận Tổ quốc Việt Nam là Trung tâm của hệ thống chính trị.", "Nhà nước Cộng hoà XHCN Việt Nam là tổ chức quan trọng thực hiện quyền lực chính trị, là trụ cột của hệ thống chính trị."], "ans": "B"}, {"stt": "148", "q": "Nhân tố hàng đầu quyết định thắng lợi của cách mạng Việt Nam là gì?", "options": ["Đại đoàn kết toàn quân, dân.", "Sự lãnh đạo đúng đắn của Đảng.", "Quân đội anh hùng, dũng cảm.", "Viện trợ của các nước XHCN."], "ans": "B"}, {"stt": "149", "q": "Quốc hội khoá I họp phiên đầu tiên lập Chính phủ chính thức vào thời gian nào?", "options": ["Ngày 03/02/1946.", "Ngày 02/03/1946.", "Ngày 01/01/1946.", "Ngày 02/02/1946."], "ans": "B"}, {"stt": "150", "q": "Chọn đáp án KHÔNG đúng. Nguyên nhân thất bại của các phong trào theo khuyng hướng phong kiến, tư sản và tiểu tư sản:", "options": ["Thiếu đường lối chính trị đúng đắn.", "Chưa có một tổ chức vững mạnh.", "Không tập trung giải quyết được mâu thuẫn chủ yếu trong xã hội.", "Không có lãnh đạo giỏi, tài tình."], "ans": "D"}, {"stt": "151", "q": "Chương trình hành động của Đảng Cộng sản Đông Dương nhằm khôi phục hệ thống tổ chức Đảng được đưa ra:", "options": ["Tháng 03/1932.", "Tháng 06/1932.", "Tháng 05/1932.", "Tháng 04/1932."], "ans": "B"}, {"stt": "152", "q": "Chọn đáp án KHÔNG đúng. Bước đi thực hiện công nghiệp hoá XHCN trong Đại hội V là:", "options": ["Phát triển một số ngành công nghiệp nặng hợp lý: điện, than…", "Phát triển nông nghiệp, coi nông nghiệp là mặt trận hàng đầu.", "Phát triển công nghiệp nhẹ hàng tiêu dùng, tạo hàng xuất khẩu.", "Kết hợp công – nông nghiệp, song ưu tiên cho công nghiệp."], "ans": "D"}, {"stt": "153", "q": "Văn kiện nào của Đảng nhấn mạnh “Vấn đề thổ địa là cái cốt của cách mạng tư sản dân quyền”?", "options": ["Chánh cương vắn tắt và Sách lược vắn tắt của Đảng.", "Chỉ thị thành lập Hội phản đế đồng minh (18/11/1930).", "Luận cương chính trị của Đảng Cộng sản Đông Dương.", "Chung quanh vấn đề chính sách mới của Đảng (10/1936)."], "ans": "C"}, {"stt": "154", "q": "Việt Nam Quốc dân Đảng được thành lập vào thời gian nào?", "options": ["Tháng 12/1927.", "Tháng 11/1926.", "Tháng 08/1925.", "Tháng 07/1925."], "ans": "A"}, {"stt": "155", "q": "Tổng thống Pháp ra sắc lệnh thành lập Liên bang Đông Dương thuộc Pháp vào thời gian nào?", "options": ["Ngày 16/10/1887.", "Ngày 16/10/1886.", "Ngày 17/10/1886.", "Ngày 17/10/1887."], "ans": "D"}, {"stt": "156", "q": "Ý nghĩa học tập lịch sử Đảng Cộng sản Việt Nam là gì?", "options": ["Vận dụng bài học kinh nghiệm trong thực tiễn lãnh đạo của Đảng hiện nay.", "Nắm vững có hệ thống những vấn đề cơ bản của lịch sử Đảng Cộng sản Việt Nam.", "Làm rõ thắng lợi, thành tựu, kinh nghiệm, bài học của cách mạng Việt Nam.", "Hiểu sâu sắc hơn những vấn đề cơ bản của lịch sử Đảng Cộng sản Việt Nam."], "ans": "C"}, {"stt": "157", "q": "Chọn đáp án KHÔNG đúng. Phương pháp nghiên cứu khoa học Lịch sử Đảng:", "options": ["Phương pháp lịch sử.", "Phương pháp tâm lý.", "Phương pháp logic.", "Phương pháp so sánh."], "ans": "B"}, {"stt": "158", "q": "Luận cương Chính trị của Đảng Cộng sản Đông Dương ra đời vào thời gian nào?", "options": ["Tháng 02/1930.", "Tháng 04/1930.", "Tháng 10/1930.", "Tháng 08/1930."], "ans": "C"}, {"stt": "159", "q": "Hội nghị Trung ương 6 (01/2008) đưa ra chủ trương và giải pháp để:", "options": ["Tiếp tục hoàn thiện cơ chế, chính sách và pháp luật của Nhà nước.", "Tiếp tục hoàn thiện thể chế kinh tế thị trường định hướng XHCN.", "Tiếp tục hoàn thiện nền kinh tế thị trường định hướng XHCN.", "Đổi mới công tác quản lý nhà nước đối vơi nền kinh tế thị trường."], "ans": "B"}, {"stt": "160", "q": "Chỉ thị “Kháng chiến kiến quốc” nêu rõ mục tiêu của cách mạng Đông Dương lúc này là:", "options": ["Dân tộc là trên hết.", "Dân tộc giải phóng.", "Tất cả vì độc lập.", "Tổ quốc là trên hết."], "ans": "B"}, {"stt": "161", "q": "Cách mạng Tháng 10/1917 Nga ảnh hưởng đến nhận thức Nguyễn Tất Thành cho một phong trào có Đảng Cộng sản lãnh đạo:", "options": ["Cách mạng chưa đến nơi.", "Cách mạng đến nơi.", "Cách mạng thành công.", "Thành công chưa triệt để."], "ans": "B"}, {"stt": "162", "q": "Đại hội XI (2011) của Đảng đã thông qua văn kiện nào?", "options": ["Chiến lược phát triển kinh tế, xã hội giai đoạn 2021 đến 2030.", "Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên CNXH.", "Chiến lược phát triển kinh tế, xã hội giai đoạn 2011 đến 2021.", "Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên CNXH bổ sung."], "ans": "D"}, {"stt": "163", "q": "Luận cương về vấn đề dân tộc và thuộc địa được thông qua Đại hội nào? Thời gian nào?", "options": ["Đại hội Đảng Xã hội Pháp, năm 1920.", "Đại hội Đảng Cộng sản Pháp, năm 1920.", "Đại hội II – Quốc tế Cộng sản, năm 1920.", "Đại hội III – Quốc tế Cộng sản, năm 1923."], "ans": "C"}, {"stt": "164", "q": "Để làm thất bại âm mưu “diệt Cộng, cầm Hồ, phá Việt Minh, Đảng thực hiện sách lược gì với quân Tưởng?", "options": ["Hoa - Việt thân thiện, hợp tác, phát triển.", "Dĩ hoà vi quý, biến xung đột lớn thành nhỏ.", "Hoà hoãn, nhân nhượng có nguyên tắc.", "Biến xung đột nhỏ thành không có xung đột."], "ans": "C"}, {"stt": "165", "q": "Chọn đáp án KHÔNG đúng. Hội nghị thành lập Đảng thông qua các văn kiện:", "options": ["Chánh cương vắn tắt của Đảng.", "Sách lược vắn tắt của Đảng.", "Điều lệ vắn tắt của Đảng.", "Chương trình hoạt động của Đảng."], "ans": "D"}, {"stt": "166", "q": "Động lực của cách mạng Việt Nam trong báo cáo tại Đại hội Đảng toàn quốc lần thứ II là:", "options": ["Công nhân, nông dân, tiểu tư sản, tư sản dân tộc.", "Giai cấp công nhân, nông dân, lao động trí thức.", "Công nhân, trí thức, nông dân, tư sản dân tộc.", "Công nhân, nông dân, tư sản dân tộc, địa chủ."], "ans": "A"}, {"stt": "167", "q": "Người tham gia sáng lập Việt Nam Quốc dân Đảng là ai?", "options": ["Phạm Tuấn Tài.", "Nguyễn Thái Học.", "Trần Huy Liệu.", "Tôn Quang Phiệt."], "ans": "A"}, {"stt": "168", "q": "Cuối 1952, lực lượng vũ trang nhân dân Việt Nam đã hình thành bao nhiêu đại đoàn quân chủ lực?", "options": ["5 đại đoàn bộ binh, 1 đại đoàn thuỷ binh, 1 đại đoàn pháo binh.", "5 đại đoàn bộ binh, 1 đại đoàn pháo binh, 1 đại đoàn công binh.", "6 đại đoàn bộ binh và 1 đại đoàn tăng thiết giáp.", "6 đại đoàn bộ binh và 1 đại đoàn công binh - pháo binh."], "ans": "D"}, {"stt": "169", "q": "Chủ tịch Hồ Chí Minh ra Lời kêu gọi toàn quốc kháng chiến vào thời gian nào?", "options": ["Đêm ngày 19/12/1946.", "Đêm ngày 18/12/1946.", "Sáng ngày 19/12/1946.", "Sáng ngày 18/12/1946."], "ans": "A"}, {"stt": "170", "q": "Đâu là yếu tố quyết định cho sự phát triển bền vững của quá trình CNH, HDH tri thức?", "options": ["Vốn.", "Con người.", "Cơ cấu kinh tế.", "Thể chế chính trị và quản lí nhà nước."], "ans": "B"}, {"stt": "171", "q": "Việt Nam Tuyên truyền giải phóng quân được thành lập thời gian nào?", "options": ["Ngày 22/12/1944.", "Ngày 10/05/1945.", "Ngày 22/12/1945.", "Ngày 22/12/1943."], "ans": "A"}, {"stt": "172", "q": "Từ tháng 03/1951, Đảng chủ trương mở chiến dịch Hoàng Hoa Thám, có tên gọi khác là:", "options": ["Đường 18.", "Trung Du.", "Hà Nam Ninh.", "Biên giới."], "ans": "A"}, {"stt": "173", "q": "Pháp khai thác thuộc địa lần thứ nhất, ở nước ta có giai cấp mới nào được hình thành?", "options": ["Giai cấp tư sản.", "Giai cấp công nhân.", "Giai cấp tiểu tư sản.", "Tiểu tư sản thành thị."], "ans": "B"}, {"stt": "174", "q": "Đại hội X nhận thức xã hội XHCN mà nhân dân ta xây dựng có bao nhiêu đặc trưng?", "options": ["Bốn đặc trưng.", "Sáu đặc trưng.", "Tám đặc trưng.", "Bảy đặc trưng."], "ans": "D"}, {"stt": "175", "q": "Sự kiện nào bắt đầu cho cao trào đánh Mỹ, diệt nguỵ ở miền Nam?", "options": ["Chiến thắng Khe Sanh, tháng 01/1968.", "Chiến thắng Plâyme, tháng 11/1965.", "Chiến thắng Vạn Tường, tháng 08/1965.", "Chiến thắng Núi Thành, tháng 05/1965."], "ans": "C"}, {"stt": "176", "q": "Cương lĩnh chính trị đầu tiên của Đảng Cộng sản là nội dung của văn kiện nào?", "options": ["Chánh cương, sách lược vắn tắt và Chương trình tóm tắt của Đảng.", "Chánh cương vắn tắt của Đảng và Sách lược vắn tắt của Đảng.", "Chính cương vắn tắt của Đảng và Chương trình tóm tắt của Đảng.", "Chương trình tóm tắt của Đảng và Sách lược vắn tắt của Đảng."], "ans": "B"}, {"stt": "177", "q": "Đại đoàn quân tiên phong của lực lượng vũ trang nhân dân Việt Nam là:", "options": ["Đại đoàn 308.", "Đại đoàn 316.", "Đại đoàn 320.", "Đại đoàn 304."], "ans": "A"}, {"stt": "178", "q": "Đặc điểm nào của cơ chế quản lí kinh tế thời kí trước đổi mới đã triệt tiêu các yếu tố của thị trường?", "options": ["Nhà nước quản lí kinh tế thông qua chế độ “cấp phát giao nộp” và chơ chế “xin cho”.", "Các doanh nghiệp không có quyền tự chủ sản xuất kinh doanh .Giá cả do nhà nước quy định.", "Nhà nước quản lí kinh tế chủ yếu bằng hệ thống chỉ tiêu pháp lệch chi tiết áp đặt từ trên xuống dưới.", "Bộ máy quản lí cồng kềnh, phong cách cửa quyền, quan liêu."], "ans": "C"}, {"stt": "179", "q": "Mục tiêu của việc mở rộng đối ngoại và hội nhập kinh tế quốc tế trong thời kì đổi mới là:", "options": ["Làm giảm nguồn lực đáp ứng yêu cầu phát triển của đất nước.", "Phát huy vai trò làm chủ tập thể của nhân dân lao động.", "Kết hợp nội lực với các nguồn lực bên ngoài tạo thành nguồn lực tổng hợp để đẩy mạnh công nghiệp hóa, hiện đại hóa.", "Đầu tư nước ngoài chiếm  tỉ trọng 90% trong nền kinh tế quốc dân."], "ans": "C"}, {"stt": "180", "q": "Việt Nam tích cực tham gia vào các diễn đàn và hoạt động của nhân dân thế giới là nội dung của:", "options": ["Tăng cường quan hệ với các đảng phái, tổ chức chính trị thế giới.", "Mở rộng quan hệ đối ngoại.", "Chủ động tham gia vào tiến trình hợp tác quốc tế và khu vực.", "Phát triển công tác đối ngoại nhân dân."], "ans": "D"}, {"stt": "181", "q": "Quốc tế Cộng sản được thành lập vào thời gian nào?", "options": ["Tháng 03/1919.", "Tháng 02/1918.", "Tháng 11/1918.", "Tháng 10/1917."], "ans": "A"}, {"stt": "182", "q": "Đại hội V đề ra nhiệm vụ chiến lược cho cách mạng Việt Nam là gì?", "options": ["Thực hiện công nghiệp hoá, hiện đại hoá đất nước; xây dựng thành công CNXH.", "Thực hiện công nghiệp hoá nông nghiệp, nông thôn; xây dựng thành công CNXH.", "Thực hiện công nghiệp hoá XHCN; bảo vệ vững chắc Tổ quốc Việt Nam XHCN.", "Xây dựng thành công CNXH; bảo vệ vững chắc Tổ quốc Việt Nam XHCN."], "ans": "D"}, {"stt": "183", "q": "Cương lĩnh năm 2011 đề ra mục tiêu xây dựng CNXH ở Việt Nam là gì?", "options": ["Dân giàu, nước mạnh, dân chủ, công bằng, văn minh.", "Dân giàu, nước mạnh, công bằng, dân chủ, văn minh.", "Dân giàu, dân chủ, nước mạnh, công bằng, văn minh.", "Dân chủ, dân giàu, nước mạnh, công bằng, văn minh."], "ans": "A"}, {"stt": "184", "q": "Cơ quan ngôn luận của tổ chức có nòng cốt là Cộng sản đoàn được thành lập vào 06/1925 là gì?", "options": ["Báo nhân đạo.", "Báo lao động.", "Báo thanh niên.", "Báo người cùng khổ."], "ans": "C"}, {"stt": "185", "q": "Nội dung cơ bản nào của quá trình CNH, HĐH gắn với kinh tế tri thức mà Đại hội X nêu ra?", "options": ["Phát triển mạnh các ngành và sản phẩm kinh tế mà nước ta có lợi thế về tri thức.", "Phát triển mạnh các ngành và sản phẩm kinh tế có giá trị gia tăng cao dựa vào tri thức.", "Phát triển mạnh các ngành và sản phẩm kinh tế mà nước ta có lợi thế về tài nguyên.", "Đẩy mạnh ứng dụng tri thức vào các ngành và sản phẩm kinh tế mà nước ta có."], "ans": "A"}, {"stt": "186", "q": "Đảng Cộng sản Việt Nam là tổ chức lãnh đạo duy nhất của cách mạng Việt Nam từ thời gian nào?", "options": ["Năm 1946.", "Năm 1930.", "Năm 1954.", "Năm 1975."], "ans": "B"}, {"stt": "187", "q": "Bộ Chính trị ra chỉ thị số 228-CT/TW về việc lãnh đạo tổng tuyển cử trong cả nước vào thời gian nào?", "options": ["Ngày 15/11/1975.", "Ngày 21/11/1975.", "Ngày 02/01/1976.", "Ngày 03/01/1976."], "ans": "D"}, {"stt": "188", "q": "Cuộc kháng chiến chống xâm lược của nhân dân Nam bộ bắt đầu vào thời gian nào?", "options": ["Ngày 23/11/1945.", "Ngày 23/09/1945.", "Ngày 19/12/1946.", "Ngày 10/12/1946."], "ans": "B"}, {"stt": "189", "q": "Cương lĩnh xây dựng đất nước trong thời kì quá độ lên CNXH được Đại hội VII thông qua còn được gọi là:", "options": ["Cương lĩnh năm 1991.", "Cương lĩnh đổi mới.", "Cương lĩnh 2011.", "Cương lĩnh dân chủ."], "ans": "A"}, {"stt": "190", "q": "Chọn đáp án KHÔNG đúng. Tổng kết 10 năm (1975 – 1986), Đảng khẳng định thành tựu nổi bật:", "options": ["Thắng lợi chủ trương thống nhất nhà nước về mặt nhà nước.", "Đạt được những thành tựu quan trọng trong xây dựng CNXH.", "Giành thắng lợi to lớn trong bảo vệ Tổ quốc, nghĩa vụ quốc tế.", "Hoàn thành các mục tiêu kinh tế, xã hội đề ra trong Đại hội V."], "ans": "D"}, {"stt": "191", "q": "Các Bộ, cơ quan ngang Bộ, cơ quan thuộc Chính phủ có nhiệm vụ:", "options": ["Bãi bỏ việc thi hành các văn bản sai trái của Chủ tịch UBND tỉnh.", "Trình dự án Luật, Pháp lệnh và các dự án khác trước Quốc hội và Uỷ ban thường vụ Quốc hội.", "Xây dựng các dự án pháp luật (luật, pháp lệnh).", "Bảo đảm trợ cấp xã hội, chỉ đạo xây dựng Hợp tác xã, công tác thanh niên trong cả nước."], "ans": "C"}, {"stt": "192", "q": "Lịch sử Đảng Cộng sản Việt Nam có chức năng khoa học là gì?", "options": ["Bốn: Nhận thức; giáo dục; dự báo; phê phán.", "Bốn: Nhận thức; dự báo; giáo dục; tuyên truyền.", "Bốn: Nhận thức; giáo dục; tuyên truyền; phê phán.", "Bốn: Học tập; tuyên truyền; giáo dục; nhận thức."], "ans": "A"}, {"stt": "193", "q": "Ban Chấp hành Trung ương lâm thời của Đảng do ai phụ trách?", "options": ["Trần Văn Lan.", "Nguyễn Phong Sắc.", "Trịnh Đình Cửu.", "Trần Phú."], "ans": "C"}, {"stt": "194", "q": "Theo luật ban hành văn bản quy phạm pháp luật năm 2008, Thủ tướng Chính phủ có thẩm quyền ban hành văn bản quy phạm pháp luật nào?", "options": ["Ban hành Nghị quyết và Quyết định.", "Ban hành Nghị quyết và Qui định.", "Ban hành Quyết định.", "Ban hành Quyết định, Chỉ thị và Thông tư."], "ans": "C"}, {"stt": "195", "q": "Hạn chế lớn nhất trong chính sách ruộng đất của Đảng ta từ 1953 – 1954 là gì?", "options": ["Nhận thức, tiếp thu giáo điều kinh nghiệm của nước ngoài.", "Không kế thừa kinh nghiệm của quá trình cải cách từng phần.", "Độc đoán, chuyên quyền, định kiến chủ quan, quan liêu.", "Không thấy hết được chuyển biến của sở hữu ruộng đất."], "ans": "C"}, {"stt": "196", "q": "Chiến dịch tiến công quy mô lớn của Đảng thành công phá kế hoạch phong toả của tướng Rơve diễn ra trong:", "options": ["75 ngày đêm.", "55 ngày đêm.", "56 ngày đêm.", "30 ngày đêm."], "ans": "D"}, {"stt": "197", "q": "Tại Đại hội nào của Đảng coi Giáo dục là quốc sách hàng đầu?", "options": ["Đại hội đại biểu toàn quốc lần thứ VI.", "Đại hội đại biểu toàn quốc lần thứ XI.", "Đại hội đại biểu toàn quốc lần thứ VIII.", "Đại hội đại biểu toàn quốc lần thứ VII."], "ans": "D"}, {"stt": "198", "q": "Mục tiêu đẩy mạnh hoạt động kinh tế đối ngoại là:", "options": ["Đưa nước ta hội nhập với thế giới.", "Xây dụng và bảo vệ Tổ quốc.", "Nâng cao vị thế của nước ta trên trường quốc tế.", "Thu hút vốn nước ngoài, chuyển giao khoa học và công nghệ tiên tiến."], "ans": "D"}, {"stt": "199", "q": "Chọn đáp án đúng nhất, Đảng Cộng sản Việt Nam là:", "options": ["Đội tiên phong của giai cấp công nhân, nông dân, nhân dân lao động Việt Nam.", "Đại biểu trung thành cho lợi ích của giai cấp công nhân, nhân dân, dân tộc Việt Nam.", "Đội tiền tuyến của giai cấp công nhân, nông dân, nhân dân lao động Việt Nam.", "Đội tiên phong và đại biểu trung thành cho lợi ích của giai cấp công nhân Việt Nam."], "ans": "B"}, {"stt": "200", "q": "Hội nghị văn hoá toàn quốc lần thứ hai diễn ra thời gian nào?", "options": ["Tháng 07/1948.", "Tháng 08/1948.", "Tháng 07/1949.", "Tháng 08/1949."], "ans": "A"}, {"stt": "201", "q": "Đại hội đảng nào lần đầu tiên khẳng định mô hình kinh tế tổng quát của việt nam là “kinh tế thị trường định hướng XHCN”?", "options": ["Đại hội VI (1986).", "Đại hội VII (1991).", "Đại hội IX ( 2001).", "Đại hội VI (2011)."], "ans": "C"}, {"stt": "202", "q": "Đâu là cơ hội của Việt Nam khi tham gia hội nhập quốc tế?", "options": ["Phát triển mạnh về kinh tế, chính trị.", "Mở rộng quan hệ đối ngoại, hợp tác phát triển kinh tế, quân sự, văn hóa.", "Mở rộng quan hệ đối ngoại nhưng không tham gia hợp tác quân sự.", "Bảo vệ hòa bình, ổn định đất nước."], "ans": "B"}, {"stt": "203", "q": "Chọn đáp án KHÔNG đúng. Chức năng giáo dục của khoa học Lịch sử Đảng:", "options": ["Ý thức, tự tôn dân tộc.", "Tinh thần yêu nước.", "Sức mạnh tinh thần.", "Ý chí tự lực, tự cường."], "ans": "C"}, {"stt": "204", "q": "Hội nghị Trung ương 3 (Khoá II – 04/1952) đề ra quyết sách lớn về:", "options": ["Chỉnh Đảng, chỉnh quân.", "Cải cách ruộng đất.", "Người cày có ruộng.", "Văn hoá, giáo dục, y tế."], "ans": "A"}, {"stt": "205", "q": "Cuối năm 1946, Pháp bội ước, liên tục khiêu khích và đánh chiếm chiếm một số địa phương như:", "options": ["Hải phòng, Lạng Sơn, Đà Nẵng, Hải Dương.", "Hải Phòng, Hải Dương, Lào Cai, Yên Bái.", "Hà Nội, Hải Phòng, vùng tự do Nam Trung Bộ.", "Đà Nẵng, Quảng Ngãi, Bình Định, Sài Gòn."], "ans": "A"}, {"stt": "206", "q": "Cuộc tổng tiến công và nổi dậy Xuân 1975 bắt đầu bằng chiến dịch nào? Thời gian nào?", "options": ["Chiến dịch Tây Nguyên, 10/03/1975.", "Chiến dịch Huế, Đà Nẵng, 21/03/1975.", "Chiến dịch Hồ Chí Minh, 26/04/1975.", "Chiến dịch Sài Gòn, Gia Định 30/04/1975."], "ans": "A"}, {"stt": "207", "q": "Trong tiến trình cách mạng từ năm 1930 đến 1951, Đảng ta đã đề ra bao nhiêu Cương lĩnh chính trị?", "options": ["Ba Cương lĩnh vào năm 1930, 1945, 1951.", "Hai cương lĩnh vào năm 1930, 1945.", "Ba Cương lĩnh vào năm 1930, 1951.", "Hai cương lĩnh vào năm 1930."], "ans": "C"}, {"stt": "208", "q": "Chọn đáp án đúng nhất. Phong trào Đồng Khởi diễn ra ở đâu? Thời gian nào?", "options": ["Bến Tre, ngày 17/01/1960.", "Trà Vinh, ngày 17/01/1960.", "Vĩnh Long, ngày 17/02/1960.", "Sóc Trăng, ngày 17/01/1959."], "ans": "A"}, {"stt": "209", "q": "Tác phẩm “Kháng chiến nhất định thắng lợi” được phát hành khi nào? Ai là tác giả?", "options": ["Tháng 07/1947, Hồ Chí Minh.", "Tháng 08/1947, Trường Chinh.", "Tháng 09/1947, Nguyễn Văn Linh.", "Tháng 10/1947, Lê Duẫn."], "ans": "B"}, {"stt": "210", "q": "Bộ Chính trị thông qua phương án mở chiến dịch Điện Biên Phủ vào thời gian nào? Ai là chỉ huy?", "options": ["Ngày 06/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 20/11/1953, Đại tướng Lê Đức Anh.", "Ngày 03/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 28/09/1953, Đại tướng Văn Tiến Dũng."], "ans": "A"}, {"stt": "211", "q": "Ba vùng tự do là hậu phương chủ yếu trong kháng chiến chống Pháp là:", "options": ["Liên khu V, Nam Bộ, Thừa Thiên Huế.", "Việt Bắc, Hà Nội, Thanh - Nghệ - Tĩnh.", "Việt Bắc, Thanh - Nghệ - Tĩnh, Liên khu V.", "Liên khu III, Liên khu IV, Liên khu V."], "ans": "C"}, {"stt": "212", "q": "Tại Đại hội đại biểu toàn quốc lần thứ II, Đảng ta quyết định:", "options": ["Lấy lại tên Đảng Cộng sản Đông Dương, hoạt động công khai.", "Lấy tên Đảng Lao động Việt Nam, ra hoạt động công khai.", "Đưa Hội nghiên cứu Chủ nghĩa Mác ra hoạt động công khai.", "Giữ nguyên tên Đảng Cộng sản Việt Nam, hoạt động công khai."], "ans": "B"}, {"stt": "213", "q": "Chọn đáp án đúng nhất. Uỷ ban nhân dân có nhiệm vụ, quyền hạn:", "options": ["Giữ liên hệ và phối hợp công tác với Uỷ ban Mặt trận Tổ quốc Việt Nam cùng cấp.", "Đôn đốc, kiểm tra UBND cùng các cơ quan nhà nước khác ở địa phương.", "Đảm bảo an ninh, trật tự, an toàn xã hội, thực hiện nhiệm vụ xây dựng lực lượng vũ trang và xây dựng quốc phòng toàn dân.", "Tiếp dân, đôn đốc kiểm tra và xem xét tình hình giải quyết kiến nghị, khiếu nại, tố cáo của công dân."], "ans": "C"}, {"stt": "214", "q": "Nhiệm vụ hàng đầu của nhân dân ta trong quá trình kháng chiến chống Pháp là gì?", "options": ["Xoá bỏ những tàn tích phong kiến, đem lại ruộng đất cho nông dân.", "Xây dựng chế độ dân chủ mới, xã hội có lối sống mới, nếp sống mới.", "Đánh đuổi thực dân Pháp xâm lược, giành độc lập, tự do, thống nhất.", "Giải phóng giai cấp công nhân, xây dựng chính quyền thuộc về dân."], "ans": "C"}, {"stt": "215", "q": "Để phát triển nguồn lực con người, đáp ứng yêu cầu của CNH, HĐH đất nước cần?", "options": ["Đặc biệt chú ý đến những yêu cầu về tinh thần con người.", "Đặc biệt chú trọng đào tạo công nghệ cao.", "Đặc biệt chú ý đến phát triển giáo dục, đào tạo.", "Đặc biệt chú trọng đến điều kiện sống của con người."], "ans": "C"}, {"stt": "216", "q": "Tổ chức Cộng sản nào đã tham dự Hội nghị thành lập Đảng?", "options": ["Đông Dương Cộng sản Đảng và Việt Nam Cộng sản Đảng.", "Đông Dương Cộng sản Liên đoàn và An Nam Cộng sản Đảng.", "An Nam Cộng sản Đảng và Đông Dương Cộng sản Đảng.", "Đông Dương cộng sản Đảng và Đông Dương Cộng sản Liên đoàn."], "ans": "C"}, {"stt": "217", "q": "Chỉ thị Nhật - Pháp bắn nhau và hành động của chúng ta phản ánh nội dung của:", "options": ["Hội nghị Ban Thường vụ Trung ương Đảng họp tháng 03/1945.", "Hội nghị Ban Chấp hành Trung ương Đảng họp tháng 05/1941.", "Hội nghị Ban Thường vụ Trung ương Đảng họp tháng 02/1943.", "Hội nghị quân sự cách mạng Bắc kỳ họp tháng 04/1945."], "ans": "A"}, {"stt": "218", "q": "Kế hoạch 5 năm lần thứ nhất, bước đầu xây dựng cơ sở vật chất CNXH trong thời gian là:", "options": ["Từ năm 1956 đến 1960.", "Từ năm 1961 đến 1965.", "Từ năm 1966 đến 1970.", "Từ năm 1976 đến 1980."], "ans": "B"}, {"stt": "219", "q": "Giữa 1953, Pháp lập kế hoạch quân sự mới ở đâu?", "options": ["Điện Biên Phủ.", "Thượng Lào, Hạ Lào.", "Lai Châu, Sơn La.", "Đông Bắc Campuchia."], "ans": "A"}, {"stt": "220", "q": "Cương lĩnh chính trị đầu tiên của Đảng xác định phương pháp tiến hành cách mạng giải phóng dân tộc là gì?", "options": ["Kết hợp vũ trang và đàm phán hoà bình.", "Kết hợp đấu tranh chính trị và vũ trang.", "Thoả hiệp khi cần thiết để xây dựng lực lượng.", "Bạo lực cách mạng của quần chúng."], "ans": "D"}, {"stt": "221", "q": "Hội nghị Trung ương 4 (Khoá VIII – 12/1997) bầu ai làm Tổng Bí thư?", "options": ["Trường Chinh.", "Đỗ Mười.", "Nguyễn Văn Linh.", "Lê Khả Phiêu."], "ans": "D"}, {"stt": "222", "q": "Trận “Điện Biên Phủ trên không” diễn ra trong bao nhiêu ngày đêm? Ở Đâu?", "options": ["12 ngày đêm, từ ngày 15 đến 27/10/1970, tại Điện Biên Phủ.", "12 ngày đêm, từ ngày 18 đến 30/12/1972, tại Hà Nội.", "12 ngày đêm, từ ngày 18 đến 30/12/1972, tại bệnh viện Bạch Mai.", "12 ngày đêm, từ ngày 17 đến 29/11/1971, tại Hải Phòng."], "ans": "B"}, {"stt": "223", "q": "Việt Nam bình thường hóa quan hệ ngoại giao với Mĩ năm:", "options": ["1995", "1990.", "1997.", "2000."], "ans": "A"}, {"stt": "224", "q": "Đảng lần đầu tiên đưa ra chủ trương tự đổi mới, tự chỉnh đốn trong:", "options": ["Hội nghị Trung ương 4 (Khoá VII – 12/1992).", "Hội nghị Trung ương 3 (Khoá VII – 06/1992).", "Hội nghị Trung ương 5 (Khoá VII – 06/1993).", "Hội nghị Trung ương 8 (Khoá VII – 01/1995)."], "ans": "B"}, {"stt": "225", "q": "Đảng Cộng sản Việt Nam là Đảng cầm quyền duy nhất lãnh đạo Nhà nước và xã hội từ thời gian nào?", "options": ["Tháng 02/1930.", "Tháng 12/1954.", "Tháng 08/1945.", "Tháng 04/1975."], "ans": "C"}, {"stt": "226", "q": "Tổ chức Cộng sản đoàn được Nguyễn ái Quốc lập ra vào thời gian nào?", "options": ["Tháng 11/1924.", "Tháng 12/1924.", "Tháng 02/1925.", "Tháng 01/1925."], "ans": "C"}, {"stt": "227", "q": "Thuận lợi căn bản nhất của Việt Nam sau Cách mạng tháng Tám năm 1945 là gì?", "options": ["Nhân dân Việt Nam quyết tâm bảo vệ chế độ mới.", "Việt Nam trở thành quốc gia độc lập, tự do.", "Liên Xô trở thành thành trì của chủ nghĩa xã hội.", "Cách mạng thế giới trên đà phát triển mạnh mẽ."], "ans": "A"}, {"stt": "228", "q": "Pháp tiến hành khai thác thuộc địa lần thứ hai ở Việt Nam thời gian nào?", "options": ["Từ 1897 đến 1914.", "Từ 1915 đến 1918.", "Từ 1930 đến 1945.", "Từ 1919 đến 1929."], "ans": "D"}, {"stt": "229", "q": "Tác phẩm: “Sơ thảo lịch sử phong trào cộng sản Đông Dương”, ra đời thời gian nào?", "options": ["Năm 1919.", "Năm 1942.", "Năm 1933.", "Năm 1943."], "ans": "C"}, {"stt": "230", "q": "Chọn đáp án đúng nhất. Chủ tịch nước được ban hành loại văn bản quy phạm pháp luật nào?", "options": ["Quyết định, Chỉ thị.", "Lệnh, Nghị quyết.", "Nghị quyết, Chỉ thị.", "Lệnh, Quyết định."], "ans": "D"}, {"stt": "231", "q": "Châu Văn Liêm và Nguyễn Thiệu là 2 đại biểu của tổ chức Cộng sản nào tham dự Hội nghị thành lập Đảng?", "options": ["Việt Nam Cộng sản Đảng.", "Đông Dương Cộng sản Liên đoàn.", "An Nam Cộng sản Đảng.", "Đông Dương Cộng sản Đảng."], "ans": "C"}, {"stt": "232", "q": "Đảng xác định mối quan hệ ngoại giao giữa Việt Nam và Liên Xô trong giai đoạn 1976 - 1985 là gì?", "options": ["Mối quan hệ đặc biệt.", "Mối quan hệ hòn đá tảng.", "Mối quan hệ anh em.", "Mối quan hệ hợp tác cùng phát triển."], "ans": "C"}, {"stt": "233", "q": "Một trong những hình thức hoạt động nào là hình thức hoạt động của Chính phủ?", "options": ["Trình dự án luật, pháp lệnh và các dự án khác trước Quốc hội và Ủy ban thường vụ Quốc hội.", "Phiên họp Chính phủ.", "Lãnh đạo công tác của các Bộ, các cơ quan ngang Bộ, cơ quan thuộc chính Phủ, UBND các cấp.", "Giáo dục pháp luật trong nhân dân."], "ans": "B"}, {"stt": "234", "q": "Nhiệm vụ hàng đầu của khoa học Lịch sử Đảng là gì?", "options": ["Vận dụng bài học kinh nghiệm trong đấu tranh cách mạng.", "Tái hiện tiến trình lịch sử lãnh đạo, đấu tranh của Đảng.", "Tổng kết từng chặng đường và suốt tiến trình lịch sử của Đảng.", "Trình bày có hệ thống Cương lĩnh, đường lối của Đảng."], "ans": "D"}, {"stt": "235", "q": "Đảng Cộng sản Việt Nam khẳng định quy luật riêng của cách mạng Việt Nam là:", "options": ["Đi lên CNXH ở nước ta là phù hợp với thực tiễn của Việt Nam và xu thế phát triển của lịch sử.", "Tiến hành cách mạng dân tộc, dân chủ nhân dân sau đó tiến lên cách mạng xã hội chủ nghĩa.", "Đi lên CNXH ở nước ta là đúng với quan điểm của chủ nghĩa Mác - Lênin và tư tưởng Hồ Chí Minh.", "Độc lập dân tộc phải gắn liền với con đường đi lên xã hội chủ nghĩa là đúng với xu thế thời đại."], "ans": "A"}, {"stt": "236", "q": "Đại hội VI tổng kết thời kỳ 1975 – 1986, rút ra bao nhiêu bài học kinh nghiệm?", "options": ["Bảy bài học quý báu.", "Năm bài học quý báu.", "Sáu bài học quý báu.", "Bốn bài học quý báu."], "ans": "D"}, {"stt": "237", "q": "Khi nào phong trào công nhân Việt Nam hoàn toàn trở thành một phong trào tự giác?", "options": ["Năm 1920 (Công hội đỏ ở Sài Gòn được thành lập).", "Năm 1929 (ba tổ chức cộng sản trong nước ra đời).", "Năm 1925 (cuộc bãi công tại nhà máy Ba Son).", "Năm 1930 (Đảng Cộng sản Việt Nam thành lập)."], "ans": "C"}, {"stt": "238", "q": "Điểm khác nhau cơ bản giữa Cương lĩnh chính trị đầu tiên và Luận cương chính trị là gì?", "options": ["Mối liên hệ giữa cách mạng Đông Dương và thế giới.", "Chủ trương tập hợp lực lượng cách mạng.", "Vai trò của giai cấp lãnh đạo cách mạng.", "Phương pháp thực hiện cuộc cách mạng."], "ans": "B"}, {"stt": "239", "q": "Thời gian hoàn thiện việc hợp nhất các tổ chức Cộng sản trong Đảng Cộng sản Việt Nam là:", "options": ["Ngày 03/02/1930.", "Ngày 22/02/1930.", "Ngày 20/02/1930.", "Ngày 24/02/1930."], "ans": "D"}, {"stt": "240", "q": "Hội nghị lần thứ 8 Ban chấp hành Trung ương Đảng diễn ra thời gian nào? Ai là Tổng Bí thư?", "options": ["Tháng 08/1941, Hà Huy Tập.", "Tháng 08/1941, Hồ Chí Minh.", "Tháng 05/1941, Nguyễn Văn Cừ.", "Tháng 05/1941, Trường Chinh."], "ans": "D"}, {"stt": "241", "q": "Sau chiến thắng Thu Đông 1947, chuyển biến lớn của tình hình thế giới ảnh hưởng đặc biệt đến cách mạng Việt Nam:", "options": ["Sự thắng lợi và phát triển mạnh mẽ của Liên bang Xô viết.", "Đảng Cộng sản Trung Quốc giành được chính quyền.", "Sự thắng lợi của phong trào giải phóng dân tộc trên thế giới.", "Đế quốc Mỹ thực hiện âm mưu khống chế các nước Tây Âu."], "ans": "B"}, {"stt": "242", "q": "Tổ chức cộng sản Đảng đầu tiên ở Việt Nam được thành lập vào thời gian nào?", "options": ["Ngày 25/03/1929.", "Ngày 15/11/1929.", "Ngày 17/06/1929.", "Ngày 28/12/1929."], "ans": "C"}, {"stt": "243", "q": "Sự kiện Nhật đảo chính Pháp ngày 9/3/1945 đã đặt ra nhiệm vụ cho cách mạng Việt Nam là:", "options": ["Chống đế quốc và tay sai, giành độc lập dân tộc.", "Tập trung lực lượng đánh đổ ách thống trị của Nhật - Pháp.", "Tập trung lực lượng đánh đổ ách thống trị của phát xít Nhật.", "Tập trung lực lượng đánh đổ ách thống trị của bọn phản động thuộc địa Pháp."], "ans": "C"}, {"stt": "244", "q": "Hiệp định về chấm dứt chiến tranh, lập lại hoà bình ở Việt Nam được ký thời gian nào?", "options": ["Ngày 27/01/1973.", "Ngày 27/02/1973.", "Ngày 27/03/1973.", "Ngày 27/04/1975."], "ans": "A"}, {"stt": "245", "q": "Chiến thắng Điện Biên Phủ lịch sử diễn ra trong bao nhiêu ngày đêm?", "options": ["56 ngày đêm.", "30 ngày đêm.", "55 ngày đêm.", "75 ngày đêm."], "ans": "A"}, {"stt": "246", "q": "Tinh thần chỉ thị Phương hướng và nhiệm vụ công tác trước mắt của cách mạng miền Nam là gì?", "options": ["Giữ vững thế tiến công, liên tục tiến công đã giành được sau phong trào Đồng khởi.", "Đấu tranh chính trị đòi thực hiện hiệp định Geneve, đi vào thế giữ gìn lực lượng.", "Từng bước khởi nghĩa từng phần làm tiêu hao, tiêu diệt lực lượng quân đội Sài Gòn.", "Khởi nghĩa vũ trang từng phần, chuyển nhanh chóng từ cầm cự sang phản công."], "ans": "A"}, {"stt": "247", "q": "Tổng tuyển cử bầu Quốc hội chung của nước Việt Nam bắt đầu thời gian nào?", "options": ["Ngày 03/01/1976.", "Ngày 25/04/1976.", "Ngày 30/04/1976.", "Ngày 01/05/1976."], "ans": "B"}, {"stt": "248", "q": "Trên cơ sở tình hình địch ở Điện Biên Phủ, Ban chỉ huy quân sự đã quyết định thay đổi thành phương châm gì?", "options": ["Đánh chắc, tiến chắc, đánh chắc thắng.", "Đánh nhanh, thắng nhanh.", "Cơ động, chủ động, linh hoạt.", "Chắc thắng mới đánh, không chắc không đánh."], "ans": "A"}, {"stt": "249", "q": "Mục tiêu cụ thể trước mắt của phong trào cách mạng 1936 – 1939 là gì?", "options": ["Độc lập, tự do cho dân tộc.", "Các quyền dân chủ đơn sơ.", "Ruộng đất cho dân cày.", "Chống chủ nghĩa phát xít."], "ans": "B"}, {"stt": "250", "q": "Sau khi ký bản Hiệp định Sơ bộ, Ban Thường vụ Trung ương Đảng đã ra:", "options": ["Chỉ thị Tình hình và chủ trương.", "Chỉ thị Hoà để tiến.", "Chỉ thị Nhật – Pháp bắn nhau và hành động của chúng ta.", "Chỉ thị Toàn quốc kháng chiến."], "ans": "B"}, {"stt": "251", "q": "Cơ quan ngôn luận của Hội liên hiệp thuộc địa, khi Nguyễn ái Quốc tham gia hoạt động nhằm chuẩn bị tư tưởng cho sự ra đời của Đảng là:", "options": ["Báo nhân đạo.", "Tạp chí Cộng sản.", "Báo đời sống công nhân.", "Báo người cùng khổ."], "ans": "D"}, {"stt": "252", "q": "Giữa 1953, nhằm tìm lối thoát trong danh dự, Pháp lập kế hoạch quân sự mới mang tên là gì?", "options": ["Kế hoạch Nava.", "Kế hoạch Rơve.", "Quả đấm thép.", "Pháo đài thép."], "ans": "A"}, {"stt": "253", "q": "Tổ chức cộng sản Đảng nào ra đời đầu tiên ở Việt Nam?", "options": ["Việt Nam Cộng sản Đảng.", "An Nam cộng sản Đảng.", "Hội Việt Nam Cách mạng Thanh niên.", "Đông Dương cộng sản Đảng."], "ans": "D"}, {"stt": "254", "q": "Hội nghị nào của Đảng thông qua cuộc Tổng tấn công và nổi dậy Tết Mậu Thân 1968?", "options": ["Hội nghị Trung ương 13, tháng 01/1967.", "Hội nghị Trung ương 14, tháng 01/1968.", "Hội nghị Bộ Chính trị, tháng 12/1967.", "Hội nghị Bộ Chính trị, tháng 10/1967."], "ans": "B"}, {"stt": "255", "q": "Chọn đáp án KHÔNG đúng. Thuận lợi giúp Việt Nam sau năm 1975:", "options": ["Các nước XHCN có sự phát triển mạnh mẽ về kinh tế, khoa học kỹ thuật.", "Đất nước đã hoà bình, thống nhất, độc lập, cả nước quá độ lên CNXH.", "Tinh thần đoàn kết, hợp tác của 3 nước Đông Dương được tăng cao.", "Lòng dân, ý Đảng được qui tụ, đồng sức, đồng lòng xây dựng đất nước."], "ans": "A"}, {"stt": "256", "q": "Lãnh tụ đầu tiên của tổ chức Việt Nam Quốc dân đảng là ai?", "options": ["Hoàng Hoa Thám.", "Vũ Hồng Khanh.", "Nguyễn Trường Tam.", "Nguyễn Thái Học."], "ans": "D"}, {"stt": "257", "q": "Chọn đáp án đúng nhất. Đại hội V của Đảng lần đầu tiên đưa ra chủ trương:", "options": ["Công nghiệp hoá nông nghiệp, nông thôn.", "Công nghiệp hoá, hiện đại hoá đất nước.", "Công nghiệp hoá trong chặng đường đầu tiên.", "Kinh tế thị trường định hướng xã hội chủ nghĩa."], "ans": "C"}, {"stt": "258", "q": "Tổ chức An Nam Cộng sản Đảng được thành lập vào thời gian nào?", "options": ["Tháng 10/1929.", "Tháng 09/1929.", "Tháng 08/1929.", "Tháng 11/1929."], "ans": "C"}, {"stt": "259", "q": "Năm 1943, Đề cương văn hóa của Đảng Cộng sản Đông dương ra đời đã vạch ra con đường phát triển văn hóa dân tộc theo nguyên tắc:", "options": ["Nhân văn, dân chủ và tiến bộ.", "Dân tộc hóa, đại chúng hóa và khoa học hóa.", "Xây dựng văn hóa tiên tiến, đậm đà bản sắc dân tộc.", "Chấn hưng dân khí, khai thông dân trí, mở rộng dân quyền, cải thiện dân sinh."], "ans": "B"}, {"stt": "260", "q": "Để tăng cường sự lãnh đạo, nâng cao sức chiến đấu thì quy luật phát triển của Đảng:", "options": ["Công chính và nghiêm minh.", "Tự chỉnh đốn và tự đổi mới.", "Tự phê bình và phê bình.", "Kỷ luật và nghiêm minh."], "ans": "C"}, {"stt": "261", "q": "Những năm đầu thế kỷ XX, phong trào cách mạng ở Việt Nam chủ yếu theo khuynh hướng nào?", "options": ["Dân chủ tư sản, tiểu tư sản.", "Trào lưu dân chủ tư sản.", "Cách mạng vô sản.", "Cách mạng phong kiến."], "ans": "A"}, {"stt": "262", "q": "Quân ta tiếp quản Thủ đô Hà Nội vào thời gian nào?", "options": ["Ngày 01/10/1954.", "Ngày 10/10/1954.", "Ngày 16/05/1955.", "Ngày 10/10/1955."], "ans": "B"}, {"stt": "263", "q": "Chọn đáp án đúng nhất. Một trong những chức năng của Quốc hội:", "options": ["Tổ chức thực hiện thực tế các chủ trương, chính sách của Đảng, pháp luật của Nhà nước.", "Giám sát tối cao đối với toàn bộ hoạt động của Nhà nước.", "Thực hiện chính sách đối nội và đối ngoại của đất nước.", "Tổ chức các kỳ họp Quốc hội."], "ans": "B"}, {"stt": "264", "q": "Hội nghị Trung ương 5 (Khoá II – 11/1953) thông qua:", "options": ["Chỉ thị giảm tô, giảm tức.", "Cương lĩnh ruộng đất.", "Chính sách nông dân, nông thôn.", "Chính sách cải cách ruộng đất."], "ans": "B"}, {"stt": "265", "q": "Bài học kinh nghiệm đầu tiên được Đại hội VI rút ra là gì?", "options": ["Tôn trọng và hành động theo quy luật khách quan.", "Kết hợp sức mạnh dân tộc với sức mạnh thời đại.", "Quán triệt tư tưởng Đảng lấy dân làm gốc.", "Chăm lo công tác xây dựng Đảng, xứng tầm lãnh đạo."], "ans": "C"}, {"stt": "266", "q": "Uỷ ban khởi nghĩa toàn quốc được thành lập vào thời gian nào?", "options": ["Ngày 12/08/1945.", "Ngày 14/08/1945.", "Ngày 13/08/1945.", "Ngày 15/08/1945."], "ans": "C"}, {"stt": "267", "q": "Trung ương Đảng ra chỉ thị Toàn dân kháng chiến vào thời gian nào?", "options": ["Ngày 25/11/1946.", "Ngày 12/12/1946.", "Ngày 16/12/1946.", "Ngày 18/12/1946."], "ans": "B"}, {"stt": "268", "q": "Đại diện cho xu hướng cải cách trong trào lưu dân chủ tư sản là ai?", "options": ["Phan Châu Trinh.", "Phan Bội Châu.", "Nguyễn Thái Học.", "Hoàng Hoa Thám."], "ans": "A"}, {"stt": "269", "q": "Theo chỉ đạo của Quốc tế Cộng sản, Ban Chỉ huy ở ngoài của Đảng được thành lập vào thời gian nào? Ai đứng đầu?", "options": ["Đầu năm 1933, Phùng Chí Kiên.", "Đầu năm 1934, Lê Hồng Phong.", "Cuối năm 1933, Hà Huy Tập.", "Đầu năm 1935, Nguyễn Văn Cừ."], "ans": "B"}, {"stt": "270", "q": "Một trong những thách thức Việt Nam gặp phải trong hoạt động đối ngoại thời kì đổi mới:", "options": ["Nền kinh tế còn chậm phát triển, thu nhập bình quân đầu người chưa cao.", "Nền kinh tế Việt Nam phải chịu sức ép cạnh tranh gay gắt.", "Tệ nạn xã hội ngày càng gia tăng.", "Nhiều nước trên thế giới chưa muốn hợp tác với Việt Nam."], "ans": "B"}, {"stt": "271", "q": "Chọn đáp án KHÔNG đúng. Sự phân hoá xã hội Việt Nam sau chiến tranh thế giới thứ nhất:", "options": ["Giai cấp nông dân chiếm hơn 90% dân số.", "Tiểu tư sản thành thị phát triển nhanh chóng.", "Giai cấp tư sản Việt Nam xuất hiện muộn.", "Địa chủ phong kiến làm tay sai cho Pháp."], "ans": "B"}, {"stt": "272", "q": "Đại hội IV đề ra đường lối xây dựng, phát triển kinh tế có điểm nổi bật là gì?", "options": ["Phát triển công nghiệp nặng trên cơ sở nông nghiệp.", "Ưu tiên phát triển công nghiệp nặng một cách hợp lý.", "Phát triển công nghiệp nặng trên cơ sở công nghiệp nhẹ.", "Ưu tiên phát triển nông nghiệp, coi nông nghiệp là hàng đầu."], "ans": "B"}, {"stt": "273", "q": "Cuộc tổng tiến công và nổi dậy Xuân 1975 diễn ra trong bao nhiêu ngày đêm?", "options": ["81 ngày đêm.", "75 ngày đêm.", "56 ngày đêm.", "55 ngày đêm."], "ans": "D"}, {"stt": "274", "q": "Việt Nam không là thành viên của tổ chức nào?", "options": ["WTO.", "FAO.", "EU.", "WHO."], "ans": "C"}, {"stt": "275", "q": "Cuộc tổng tiến công và nổi dậy giải phóng Sài Gòn trước tháng 05/1975 được đề ra trong:", "options": ["Hội nghị Bộ Chính trị (18/03/1975).", "Hội nghị Bộ Chính trị (từ 30/09 đến 08/10/1974).", "Hội nghị Trung ương 21 (Khoá III – 07/1973).", "Hội nghị Bộ Chính trị (từ 08/12/1974 đến 07/01/1975)."], "ans": "A"}, {"stt": "276", "q": "Thời gian hoàn tất quá trình thành lập Đông Dương Cộng sản Liên đoàn là khi nào?", "options": ["Tháng 11/1929.", "Tháng 12/1929.", "Tháng 10/1929.", "Tháng 09/1929."], "ans": "B"}, {"stt": "277", "q": "Mỹ bắt đầu đưa quân viễn chinh Mỹ trực tiếp tham chiến ở Việt Nam thời gian nào? Ở đâu?", "options": ["Ngày 01/11/1963, tại Sài Gòn.", "Ngày 05/08/1964, tại Hải Phòng.", "Ngày 05/08/1964, tại Hà Nội.", "Ngày 08/03/1965, tại Đà Nẵng."], "ans": "D"}, {"stt": "278", "q": "Chọn đáp án đúng nhất. Bước đột phá thứ ba về đổi mới kinh tế được đưa ra trong:", "options": ["Hội nghị Trung ương 8 (Khoá V – 06/1985).", "Hội nghị Bộ chính trị khoá V (08/1986).", "Hội nghị Trung ương 9 (Khoá V – 12/1985).", "Hội nghị Bộ chính trị khoá IV (08/1985)."], "ans": "B"}, {"stt": "279", "q": "Đại hội Đảng toàn quốc lần thứ II đã bầu ai làm Tổng Bí thư?", "options": ["Hồ Chí Minh.", "Tôn Đức Thắng.", "Lê Duẩn.", "Trường Chinh."], "ans": "D"}, {"stt": "280", "q": "Nhiệm vụ bức thiết nhất Đảng đặt ra để đưa đất nước bước vào kỷ nguyên mới là gì?", "options": ["Tổng tuyển cử thống nhất đất nước trong cả nước.", "Triển khai mô hình quá độ lên CNXH trong cả nước.", "Lãnh đạo thống nhất nhà nước về mặt nhà nước.", "Khắc phục những hậu quả nặng nề của chiến tranh."], "ans": "C"}, {"stt": "281", "q": "Tác giả Hồng Thế Công của “Sơ thảo lịch sử phong trào cộng sản Đông Dương”, tên thật là gì?", "options": ["Trường Chinh.", "Hồ Chí Minh.", "Lê Hồng Phong.", "Hà Huy Tập."], "ans": "D"}, {"stt": "282", "q": "Trịnh Đình Cửu và Nguyễn Đức Cảnh là 2 đại biểu của tổ chức Cộng sản nào tham dự Hội nghị thành lập Đảng?", "options": ["An Nam Cộng sản Đảng.", "Đông Dương Cộng sản Liên đoàn.", "Việt Nam Cộng sản Đảng.", "Đông Dương Cộng sản Đảng."], "ans": "D"}, {"stt": "283", "q": "Sự phát triển mạnh mẽ các cuộc đấu tranh năm 1929 tất yếu hình thành bao nhiêu tổ chức cộng sản trong nước?", "options": ["Ba: Đông Dương Cộng sản Đảng, An Nam Cộng sản Đảng, Tân Việt Cách mạng Đảng.", "Ba: Đông Dương Cộng sản Đảng, An Nam Cộng sản Đảng, Đông Dương Cộng sản Liên đoàn.", "Ba: Đông Dương Cộng sản Đảng, Việt Nam Cộng sản Đảng, Đông Dương Cộng sản Liên đoàn.", "Ba: Đông Dương Cộng sản Đảng, Việt Nam Cộng sản Đảng, Tân Việt Cách mạng Đảng."], "ans": "B"}, {"stt": "284", "q": "Để gạt mũi nhọn tiến công kẻ thù, Đảng Cộng sản Đông Dương đã thông cáo tự giải tán vào thời gian nào? Lấy tên gọi là gì?", "options": ["Ngày 02/09/1945; Hội nghiên cứu lý luận Đông Dương.", "Ngày 25/11/1945; Hội nghiên cứu chủ nghĩa Mác – Lênin.", "Ngày 03/02/1946; Hội Những người Lao động Việt Nam.", "Ngày 11/11/1945; Hội nghiên cứu Chủ nghĩa Mác ở Đông Dương."], "ans": "D"}, {"stt": "285", "q": "Những năm cuối thế kỷ XIX, phong trào cách mạng ở Việt Nam chủ yếu theo khuynh hướng nào?", "options": ["Cách mạng tư sản.", "Dân chủ tư sản.", "Vô sản.", "Phong kiến."], "ans": "D"}, {"stt": "286", "q": "Tiền thân của Đông Dương Cộng sản Liên đoàn là tổ chức gì?", "options": ["Hội Việt Nam Cách mạng Thanh niên.", "Việt Nam Quốc dân đảng.", "Việt Nam Quang phục Hội.", "Tân Việt Cách mạng Đảng."], "ans": "D"}, {"stt": "287", "q": "Ban nghiên cứu Lịch sử Đảng Trung ương được thành lập vào thời gian nào?", "options": ["Năm 1943.", "Năm 1960.", "Năm 1986", "Năm 1962."], "ans": "D"}, {"stt": "288", "q": "Trong tổ chức bộ máy hành chính Nhà nước ta, có:", "options": ["Mặt trận Tổ quốc.", "Văn phòng Chính phủ.", "Quốc hội và Văn phòng Quốc hội.", "Tòa án nhân dân và Viện kiểm sát nhân dân."], "ans": "C"}, {"stt": "289", "q": "Các yếu tố văn hóa truyền thống lâu đời và tốt đẹp của dân tộc, thiên về giá trị tinh thần gọi là:", "options": ["Văn hiến.", "Văn vật.", "Văn minh.", "Văn hóa văn vật."], "ans": "A"}, {"stt": "290", "q": "Trước đổi mới, chúng ta xem đặc trưng nào là quan trọng nhất của kinh tế XHXN?", "options": ["Thị trường là căn cứ chủ yếu để lập kế hoạch.", "Kế hoạch hóa.", "Nền kinh tế đóng.", "Sản xuất hàng hóa."], "ans": "B"}, {"stt": "291", "q": "Chọn đáp án KHÔNG đúng. Sách lược cụ thể của Đảng ta với quân Tưởng và tay sai:", "options": ["Cho phép quân đội Tưởng đóng một số địa phương ở Việt Nam.", "Cho Việt Quốc, Việt Cách tham gia Quốc hội và Chính phủ.", "Cung cấp lương thực, thực phẩm cần thiết cho quân đội Tưởng.", "Chấp nhận cho quân Tưởng sử dụng đồng tiền Quan kim, Quốc tệ."], "ans": "A"}, {"stt": "292", "q": "Chính phủ lâm thời Việt Nam Dân chủ Cộng hoà họp phiên đầu tiên vào thời gian nào?", "options": ["Ngày 01/01/1946.", "Ngày 05/09/1945.", "Ngày 20/10/1945.", "Ngày 03/09/1945."], "ans": "D"}, {"stt": "293", "q": "Ngày 14/07/1986, tại Hội nghị Ban chấp hành TW đặc biệt, ai được bầu làm Tổng Bí thư?", "options": ["Nguyễn Văn Linh.", "Đỗ Mười.", "Lê Khả Phiêu.", "Trường Chinh."], "ans": "D"}, {"stt": "294", "q": "Đại diện cho xu hướng cách mạng bạo động trong trào lưu dân chủ tư sản là ai?", "options": ["Phan Bội Châu.", "Huỳnh Thúc Kháng.", "Phan Châu Trinh.", "Hoàng Hoa Thám."], "ans": "A"}, {"stt": "295", "q": "Chọn đáp án KHÔNG đúng. Nội dung Cương lĩnh chính trị đầu tiên của Đảng về phương diện xã hội:", "options": ["Chia lại ruộng đất cho dân cày.", "Nam nữ bình quyền.", "Phổ thông giáo dục theo công nông hoá.", "Dân chúng được tự do tổ chức."], "ans": "A"}, {"stt": "296", "q": "Phiên họp đầu tiên của Chính phủ lâm thời đã xác định các nhiệm vụ cấp bách trước mắt là:", "options": ["Diệt giặc đói, giặc dốt và giặc ngoại xâm.", "Chống ngoại xâm và nội phản trong nước.", "Chống thực dân Pháp xâm lược lần thứ 2.", "Hoà hoãn với quân Tưởng Giới Thạch."], "ans": "A"}, {"stt": "297", "q": "Bản Đề cương Cách mạng miền Nam do ai chủ trì dự thảo? Vào thời gian nào?", "options": ["Phạm Hùng, tháng 07/1954.", "Lê Duẩn, tháng 08/1956.", "Lê Đức Thọ, tháng 08/1955.", "Phạm Văn Đồng, tháng 09/1957."], "ans": "B"}, {"stt": "298", "q": "Đại hội đại biểu toàn quốc lần thứ VI bầu ai làm Tổng Bí thư của Đảng?", "options": ["Tôn Đức Thắng.", "Đỗ Mười.", "Nguyễn Văn Linh.", "Trường Chinh."], "ans": "C"}, {"stt": "299", "q": "Cuộc tổng giao chiến mở đầu kháng chiến chống Pháp của quân và dân ta ở Hà Nội đã diễn ra trong:", "options": ["55 ngày đêm.", "12 ngày đêm.", "30 ngày đêm.", "56 ngày đêm."], "ans": "C"}, {"stt": "300", "q": "Mặt trận Việt Minh ra Tuyên ngôn về sự ra đời của Mặt trận vào thời gian nào?", "options": ["Tháng 05/1941.", "Tháng 06/1941.", "Tháng 10/1941.", "Tháng 11/1941."], "ans": "C"}, {"stt": "301", "q": "Tính cho đến bây giờ Đảng ta đã tiến hành tất cả bao nhiêu kỳ đại hội tất cả?", "options": ["13", "14", "15", "16"], "ans": "B"}], "DANH TU RIENG": [{"stt": "15", "q": "Mặt trận dân tộc giải phóng miền Nam Việt Nam do ai làm chủ tịch?", "options": ["Huỳnh Thúc Kháng.", "Văn Hữu Thọ.", "Nguyễn Hữu Thọ.", "Nguyễn Văn Cừ."], "ans": "C"}, {"stt": "18", "q": "Ai dẫn đầu phái đoàn Việt Nam tham dự Hội nghị Phôngtenơblô?", "options": ["Hồ Chí Minh.", "Nguyễn Thị Kim Ngân.", "Pham Văn Đồng.", "Huỳnh Thúc Kháng."], "ans": "C"}, {"stt": "23", "q": "Đại hội đại biểu toàn quốc lần thứ V bầu ai làm Tổng Bí thư của Đảng?", "options": ["Lê Duẫn.", "Đỗ Mười.", "Tôn Đức Thắng.", "Trường Chinh."], "ans": "A"}, {"stt": "49", "q": "Hội nghị lần thứ nhất Ban Chấp hành Trung ương bầu ai làm Tổng Bí thư?", "options": ["Hồ Chí Minh.", "Trần Phú.", "Hà Huy Tập.", "Lê Hồng Phong."], "ans": "B"}, {"stt": "76", "q": "Tổ chức cộng sản Đảng đầu tiên ở Việt Nam do ai làm bí thư?", "options": ["Bí thư Trần Văn Cung.", "Bí thư Trịnh Đình Cửu.", "Bí thư Ngô Gia Tự.", "Bí thư Nguyễn Đức Cảnh."], "ans": "B"}, {"stt": "109", "q": "Tổ chức Quốc tế Cộng sản do ai đứng đầu thành lập?", "options": ["Ph.Ăngghen.", "C.Mác.", "V.I.Lênin.", "I.V.Stalin."], "ans": "C"}, {"stt": "129", "q": "Đại hội đại biểu toàn quốc lần thứ IV bầu ai làm Tổng Bí thư của Đảng?", "options": ["Nguyễn Lương Bằng.", "Phạm Văn Đồng.", "Lê Duẫn.", "Nguyễn Văn Linh."], "ans": "C"}, {"stt": "167", "q": "Người tham gia sáng lập Việt Nam Quốc dân Đảng là ai?", "options": ["Phạm Tuấn Tài.", "Nguyễn Thái Học.", "Trần Huy Liệu.", "Tôn Quang Phiệt."], "ans": "A"}, {"stt": "193", "q": "Ban Chấp hành Trung ương lâm thời của Đảng do ai phụ trách?", "options": ["Trần Văn Lan.", "Nguyễn Phong Sắc.", "Trịnh Đình Cửu.", "Trần Phú."], "ans": "C"}, {"stt": "209", "q": "Tác phẩm “Kháng chiến nhất định thắng lợi” được phát hành khi nào? Ai là tác giả?", "options": ["Tháng 07/1947, Hồ Chí Minh.", "Tháng 08/1947, Trường Chinh.", "Tháng 09/1947, Nguyễn Văn Linh.", "Tháng 10/1947, Lê Duẫn."], "ans": "B"}, {"stt": "210", "q": "Bộ Chính trị thông qua phương án mở chiến dịch Điện Biên Phủ vào thời gian nào? Ai là chỉ huy?", "options": ["Ngày 06/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 20/11/1953, Đại tướng Lê Đức Anh.", "Ngày 03/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 28/09/1953, Đại tướng Văn Tiến Dũng."], "ans": "A"}, {"stt": "222", "q": "Hội nghị Trung ương 4 (Khoá VIII – 12/1997) bầu ai làm Tổng Bí thư?", "options": ["Trường Chinh.", "Đỗ Mười.", "Nguyễn Văn Linh.", "Lê Khả Phiêu."], "ans": "D"}, {"stt": "241", "q": "Hội nghị lần thứ 8 Ban chấp hành Trung ương Đảng diễn ra thời gian nào? Ai là Tổng Bí thư?", "options": ["Tháng 08/1941, Hà Huy Tập.", "Tháng 08/1941, Hồ Chí Minh.", "Tháng 05/1941, Nguyễn Văn Cừ.", "Tháng 05/1941, Trường Chinh."], "ans": "D"}, {"stt": "257", "q": "Lãnh tụ đầu tiên của tổ chức Việt Nam Quốc dân đảng là ai?", "options": ["Hoàng Hoa Thám.", "Vũ Hồng Khanh.", "Nguyễn Trường Tam.", "Nguyễn Thái Học."], "ans": "D"}, {"stt": "269", "q": "Đại diện cho xu hướng cải cách trong trào lưu dân chủ tư sản là ai?", "options": ["Phan Châu Trinh.", "Phan Bội Châu.", "Nguyễn Thái Học.", "Hoàng Hoa Thám."], "ans": "A"}, {"stt": "270", "q": "Theo chỉ đạo của Quốc tế Cộng sản, Ban Chỉ huy ở ngoài của Đảng được thành lập vào thời gian nào? Ai đứng đầu?", "options": ["Đầu năm 1933, Phùng Chí Kiên.", "Đầu năm 1934, Lê Hồng Phong.", "Cuối năm 1933, Hà Huy Tập.", "Đầu năm 1935, Nguyễn Văn Cừ."], "ans": "B"}, {"stt": "280", "q": "Đại hội Đảng toàn quốc lần thứ II đã bầu ai làm Tổng Bí thư?", "options": ["Hồ Chí Minh.", "Tôn Đức Thắng.", "Lê Duẩn.", "Trường Chinh."], "ans": "D"}, {"stt": "282", "q": "Tác giả Hồng Thế Công của “Sơ thảo lịch sử phong trào cộng sản Đông Dương”, tên thật là gì?", "options": ["Trường Chinh.", "Hồ Chí Minh.", "Lê Hồng Phong.", "Hà Huy Tập."], "ans": "D"}, {"stt": "294", "q": "Ngày 14/07/1986, tại Hội nghị Ban chấp hành TW đặc biệt, ai được bầu làm Tổng Bí thư?", "options": ["Nguyễn Văn Linh.", "Đỗ Mười.", "Lê Khả Phiêu.", "Trường Chinh."], "ans": "D"}, {"stt": "295", "q": "Đại diện cho xu hướng cách mạng bạo động trong trào lưu dân chủ tư sản là ai?", "options": ["Phan Bội Châu.", "Huỳnh Thúc Kháng.", "Phan Châu Trinh.", "Hoàng Hoa Thám."], "ans": "A"}, {"stt": "298", "q": "Bản Đề cương Cách mạng miền Nam do ai chủ trì dự thảo? Vào thời gian nào?", "options": ["Phạm Hùng, tháng 07/1954.", "Lê Duẩn, tháng 08/1956.", "Lê Đức Thọ, tháng 08/1955.", "Phạm Văn Đồng, tháng 09/1957."], "ans": "B"}, {"stt": "299", "q": "Đại hội đại biểu toàn quốc lần thứ VI bầu ai làm Tổng Bí thư của Đảng?", "options": ["Tôn Đức Thắng.", "Đỗ Mười.", "Nguyễn Văn Linh.", "Trường Chinh."], "ans": "C"}], "NGAY THANG NAM": [{"stt": "1", "q": "Đại hội đại biểu toàn quốc lần thứ V của Đảng diễn ra trong thời gian nào?", "options": ["Từ ngày 27/03 đến 31/03/1981, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1976, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1982, tại Hà Nội.", "Từ ngày 27/03 đến 31/03/1982, tại Hà Nội."], "ans": "D"}, {"stt": "2", "q": "Đại hội đại biểu lần thứ nhất của Đảng diễn ra thời gian nào? Ở đâu?", "options": ["Tháng 12/1930, Hương Cảng (Trung Quốc).", "Tháng 03/1935, Ma Cao (Trung Quốc).", "Tháng 02/1934, Hồng Kông (Trung Quốc).", "Tháng 05/1933, Quảng Châu (Trung Quốc)."], "ans": "B"}, {"stt": "3", "q": "Thời gian ra bản Tuyên đạt nêu rõ việc thành lập Đông Dương Cộng sản liên đoàn?", "options": ["Tháng 09/1929.", "Tháng 11/1929.", "Tháng 10/1929.", "Tháng 12/1929."], "ans": "A"}, {"stt": "4", "q": "Ngày kỷ niệm ra đời Đảng Cộng sản Việt Nam được Hồ Chí Minh chọn là ngày:", "options": ["Ngày 06/01/1930.", "Ngày 02/03/1930.", "Ngày 07/02/1930.", "Ngày 03/02/1930."], "ans": "D"}, {"stt": "5", "q": "Cao trào đòi trả tự do cho cụ Phan Bội Châu diễn ra sôi nổi thời gian nào?", "options": ["Tháng 06/1925.", "Tháng 08/1925.", "Tháng 12/1925.", "Tháng 11/1925."], "ans": "C"}, {"stt": "6", "q": "Việt Nam đặt quan hệ ngoại giao với Trung Quốc, Liên Xô vào thời gian nào?", "options": ["Trung Quốc (18/01/1950); Liên Xô (30/01/1950).", "Trung Quốc (01/01/1950); Liên Xô (05/01/1950).", "Trung Quốc (18/02/1950); Liên Xô (30/02/1950).", "Trung Quốc (01/03/1950); Liên Xô (05/03/1950)."], "ans": "A"}, {"stt": "7", "q": "Nguyễn ái Quốc viết Báo cáo gửi Quốc tế Cộng sản về việc thành lập Đảng Cộng sản Việt Nam vào thời gian nào?", "options": ["Ngày 18/02/1930.", "Ngày 08/02/1930.", "Ngày 24/02/1930.", "Ngày 28/02/1930."], "ans": "A"}, {"stt": "8", "q": "Đại hội đại biểu toàn quốc lần thứ III của Đảng diễn ra trong thời gian nào?", "options": ["Tháng 06/1960, tại Cao Bằng.", "Tháng 09/1960, tại Hà Nội.", "Tháng 10/1960, tại Hà Nội.", "Tháng 11/1960, tại Hà Tây."], "ans": "B"}, {"stt": "9", "q": "Phong trào “Vô sản hoá” do Hội Việt Nam Cách mạng Thanh niên (Bắc kỳ) phát động từ thời gian nào?", "options": ["Ngày 26/06/1926.", "Ngày 28/09/1927.", "Ngày 29/09/1929.", "Ngày 29/09/1928."], "ans": "D"}, {"stt": "10", "q": "“Chúng ta có quyền tự hào về bản chất tốt đẹp, truyền thống anh hùng và lịch sử vẻ vang của Đảng ta…”, được trích trong:", "options": ["Nghị quyết Trung ương 4 khoá XII (30/10/2016).", "Nghị quyết Trung ương 4 khoá XII (14/10/2016).", "Nghị quyết Trung ương 5 khoá XII (05/05/2017).", "Nghị quyết Trung ương 5 khoá XII (10/05/2017)."], "ans": "A"}, {"stt": "11", "q": "Mỹ phải chấp nhận cuộc đàm phán với Chính phủ nước Việt Nam Dân chủ Cộng hoà vào thời gian nào? Ở đâu?", "options": ["Tháng 05/1968, tại Paris.", "Tháng 08/1968, tại Versey.", "Tháng 01/1969, tại Paris.", "Tháng 01/1969, tại Geneve."], "ans": "C"}, {"stt": "12", "q": "Hội nghị nào xác định kế hoạch năm 1985 tiếp tục coi trọng nông nghiệp?", "options": ["Hội nghị Trung ương 7 (Khoá V – 12/1984).", "Hội nghị Trung ương 6 (Khoá V – 07/1984).", "Hội nghị Trung ương 8 (Khoá V – 06/1985).", "Hội nghị Trung ương 9 (Khoá V – 12/1985)."], "ans": "A"}, {"stt": "13", "q": "Đại hội đại biểu toàn quốc lần thứ IV của Đảng diễn ra trong thời gian nào?", "options": ["Từ ngày 14/12 đến 20/12/1976, tại Hà Nội.", "Từ ngày 08/12 đến 14/12/1975, tại Hà Nội.", "Từ ngày 26/04 đến 30/04/1976, tại Hà Nội.", "Từ ngày 14/12 đến 20/12/1975, tại Hà Nội."], "ans": "A"}, {"stt": "14", "q": "Hội nghị Phôngtenơblô diễn ra vào thời gian nào? Ở đâu?", "options": ["Từ ngày 15/06 đến 25/09/1946, tại Paris.", "Từ ngày 12/08 đến 10/10/1946, tại Paris.", "Từ ngày 06/07 đến 10/09/1946, tại Versey.", "Từ ngày 10/09 đến 30/10/1946, tại Versey."], "ans": "C"}, {"stt": "15", "q": "Quân đội giải phóng miền Nam Việt Nam ra đời vào thời gian nào?", "options": ["Ngày 20/12/1960.", "Ngày 22/12/1960.", "Ngày 20/12/1961.", "Ngày 15/02/1961."], "ans": "D"}, {"stt": "16", "q": "Đảng đề ra chủ trương Hoàn thành thống nhất nước nhà về mặt nhà nước trong:", "options": ["Hội nghị Trung ương 24 (Khoá III – 08/1975).", "Hội nghị Trung ương 23 (Khoá III – 12/1974).", "Hội nghị Trung ương 24 (Khoá IV – 05/1976).", "Hội nghị Trung ương 25 (Khoá III – 09/1975)."], "ans": "A"}, {"stt": "17", "q": "Khối liên minh nhân dân 3 nước Việt, Lào, Campuchia được thành lập thời gian nào?", "options": ["Tháng 02/1951.", "Tháng 05/1951.", "Tháng 04/1951.", "Tháng 03/1951."], "ans": "D"}, {"stt": "18", "q": "Chi bộ Cộng sản đầu tiên ở Việt Nam được thành lập vào thời gian nào?", "options": ["Tháng 06/1929.", "Tháng 05/1929.", "Tháng 03/1930.", "Tháng 04/1929."], "ans": "C"}, {"stt": "19", "q": "Pháp tiến hành khai thác thuộc địa lần thứ nhất ở Việt Nam thời gian nào?", "options": ["Từ 1987 đến 1990.", "Từ 1884 đến 1897.", "Từ 1899 đến 1913.", "Từ 1897 đến 1914."], "ans": "D"}, {"stt": "20", "q": "Hội nghị thành lập Đảng Cộng sản Việt Nam diễn ra ở đâu? Thời gian nào?", "options": ["Hồng Kông, từ ngày 06/01 đến 07/02/1930.", "Quảng Châu, từ ngày 06/01 đến 07/02/1930.", "Cao Bằng, từ ngày 06/01 đến 07/02/1930.", "Thường Châu, từ ngày 06/01 đến 07/02/1930."], "ans": "A"}, {"stt": "21", "q": "Ban Chấp hành Trung ương Đảng chủ trương “hoãn cách mạng ruộng đất” trong:", "options": ["Hội nghị họp tháng 05/1941.", "Hội nghị họp tháng 06/1936.", "Hội nghị họp tháng 11/1939.", "Hội nghị họp tháng 07/1936."], "ans": "A"}, {"stt": "22", "q": "Chiến thắng giải phóng Thành cổ Quảng Trị diễn ra trong bao nhiêu ngày đêm?", "options": ["68 ngày đêm, từ ngày 30/03 đến 05/05/1972.", "12 ngày đêm, từ ngày 18/12 đến 30/12/1972.", "81 ngày đêm, từ ngày 28/06 đến 16/09/1972.", "123 ngày đêm, từ ngày 01/10/1972 đến 31/01/1973."], "ans": "C"}, {"stt": "23", "q": "Ban Chấp hành trung ương Đảng ra chỉ thị “Kháng chiến kiến quốc” vào thời gian nào?", "options": ["Ngày 26/11/1946.", "Ngày 26/11/1945.", "Ngày 25/11/1946.", "Ngày 25/11/1945."], "ans": "D"}, {"stt": "24", "q": "Đảng ta thực hiện đẩy mạnh công nghiệp hoá, hiện đại hoá trong kỳ Đại hội Đảng:", "options": ["Đại hội đại biểu toàn quốc lần thứ VI (1986).", "Đại hội đại biểu toàn quốc lần thứ VII (1991).", "Đại hội đại biểu toàn quốc lần thứ IX (2001).", "Đại hội đại biểu toàn quốc lần thứ VIII (1996)."], "ans": "D"}, {"stt": "25", "q": "Cao trào cách mạng Việt Nam (1930 – 1931) bắt đầu bị đế quốc Pháp đàn áp khốc liệt từ thời gian nào?", "options": ["Tháng 04/1930.", "Tháng 09/1930.", "Tháng 08/1930.", "Tháng 12/1930."], "ans": "B"}, {"stt": "26", "q": "Tác phẩm “Lịch sử nước ta”, được Hồ Chí Minh viết vào thời gian nào?", "options": ["Năm 1925.", "Năm 1969.", "Năm 1947.", "Năm 1942."], "ans": "D"}, {"stt": "27", "q": "Thời gian và địa điểm diễn ra Đại hội Đảng toàn quốc lần thứ II là gì?", "options": ["Tháng 03/1935, tại Ma Cao, Trung Quốc.", "Tháng 02/1951, tại Chiêm Hoá - Tuyên Quang.", "Tháng 02/1950, tại Tân Trào - Tuyên Quang.", "Tháng 03/1951, tại Pắc pó – Cao Bằng."], "ans": "B"}, {"stt": "28", "q": "Hiến pháp đầu tiên của nước Việt Nam Dân chủ Cộng hoà được thông qua vào:", "options": ["Ngày 09/11/1946.", "Ngày 09/11/1945.", "Ngày 10/10/1946.", "Ngày 10/10/1945."], "ans": "A"}, {"stt": "29", "q": "Quốc hội đầu tiên của nước Việt Nam Dân chủ Cộng hoà được bầu ra khi nào?", "options": ["Ngày 01/01/1946.", "Ngày 02/02/1946.", "Ngày 05/01/1946.", "Ngày 06/01/1946."], "ans": "D"}, {"stt": "30", "q": "Bộ môn khoa học Lịch sử Đảng Cộng sản Việt Nam được chỉ đạo biên soạn giáo trình từ thời gian nào?", "options": ["Ngày 10/07/1986.", "Ngày 20/07/1990.", "Ngày 27/07/1991.", "Ngày 13/07/1992."], "ans": "D"}, {"stt": "31", "q": "Hội nghị Ban Thường vụ Trung Đảng họp mở rộng tại Làng Vạn Phúc họp vào thời gian nào?", "options": ["Ngày 16/12/1946.", "Ngày 17/12/1946.", "Ngày 19/12/1946.", "Ngày 18/12/1946."], "ans": "D"}, {"stt": "32", "q": "Mặt trận dân tộc giải phóng miền Nam Việt Nam ra đời vào thời gian nào?", "options": ["20/12/1960.", "22/12/1944.", "15/02/1961.", "20/12/1958."], "ans": "A"}, {"stt": "33", "q": "Tổng Bí thư Trần Phú hy sinh thời gian nào? Ở đâu?", "options": ["Ngày 28/05/1931, tại Chợ An Đông (Sài Gòn).", "Ngày 11/04/1931, tại Chợ Bến Thành (Sài Gòn).", "Ngày 18/04/1931, tại Chợ Tân Định (Sài Gòn).", "Ngày 06/09/1931, tại Chợ quán (Sài Gòn)."], "ans": "D"}, {"stt": "34", "q": "Hiệp định sơ bộ được Hồ Chí Minh ký với Jean Sainteny vào thời gian nào?", "options": ["Ngày 06/03/1946.", "Ngày 04/03/1946.", "Ngày 05/03/1946.", "Ngày 03/03/1946."], "ans": "A"}, {"stt": "35", "q": "Sau chiến dịch Điện Biên Phủ kết thúc, Hội nghị chấm dứt chiến tranh Đông Dương bắt đầu thời gian nào? Ở đâu?", "options": ["Ngày 07/05/1954, tại Paris – Pháp.", "Ngày 08/05/1954, tại Geneve – Thuỵ Sỹ.", "Ngày 19/07/1954, tại Versey – Pháp.", "Ngày 08/05/1954, tại Geneve – Pháp."], "ans": "B"}, {"stt": "36", "q": "Quốc hội khoá I họp phiên đầu tiên lập Chính phủ chính thức vào thời gian nào?", "options": ["Ngày 03/02/1946.", "Ngày 02/03/1946.", "Ngày 01/01/1946.", "Ngày 02/02/1946."], "ans": "B"}, {"stt": "37", "q": "Chương trình hành động của Đảng Cộng sản Đông Dương nhằm khôi phục hệ thống tổ chức Đảng được đưa ra:", "options": ["Tháng 03/1932.", "Tháng 06/1932.", "Tháng 05/1932.", "Tháng 04/1932."], "ans": "B"}, {"stt": "38", "q": "Việt Nam Quốc dân Đảng được thành lập vào thời gian nào?", "options": ["Tháng 12/1927.", "Tháng 11/1926.", "Tháng 08/1925.", "Tháng 07/1925."], "ans": "A"}, {"stt": "39", "q": "Tổng thống Pháp ra sắc lệnh thành lập Liên bang Đông Dương thuộc Pháp vào thời gian nào?", "options": ["Ngày 16/10/1887.", "Ngày 16/10/1886.", "Ngày 17/10/1886.", "Ngày 17/10/1887."], "ans": "D"}, {"stt": "40", "q": "Luận cương Chính trị của Đảng Cộng sản Đông Dương ra đời vào thời gian nào?", "options": ["Tháng 02/1930.", "Tháng 04/1930.", "Tháng 10/1930.", "Tháng 08/1930."], "ans": "C"}, {"stt": "41", "q": "Chủ tịch Hồ Chí Minh ra Lời kêu gọi toàn quốc kháng chiến vào thời gian nào?", "options": ["Đêm ngày 19/12/1946.", "Đêm ngày 18/12/1946.", "Sáng ngày 19/12/1946.", "Sáng ngày 18/12/1946."], "ans": "A"}, {"stt": "42", "q": "Việt Nam Tuyên truyền giải phóng quân được thành lập thời gian nào?", "options": ["Ngày 22/12/1944.", "Ngày 10/05/1945.", "Ngày 22/12/1945.", "Ngày 22/12/1943."], "ans": "A"}, {"stt": "43", "q": "Sự kiện nào bắt đầu cho cao trào đánh Mỹ, diệt nguỵ ở miền Nam?", "options": ["Chiến thắng Khe Sanh, tháng 01/1968.", "Chiến thắng Plâyme, tháng 11/1965.", "Chiến thắng Vạn Tường, tháng 08/1965.", "Chiến thắng Núi Thành, tháng 05/1965."], "ans": "C"}, {"stt": "44", "q": "Quốc tế Cộng sản được thành lập vào thời gian nào?", "options": ["Tháng 03/1919.", "Tháng 02/1918.", "Tháng 11/1918.", "Tháng 10/1917."], "ans": "A"}, {"stt": "45", "q": "Đảng Cộng sản Việt Nam là tổ chức lãnh đạo duy nhất của cách mạng Việt Nam từ thời gian nào?", "options": ["Năm 1946.", "Năm 1930.", "Năm 1954.", "Năm 1975."], "ans": "B"}, {"stt": "46", "q": "Bộ Chính trị ra chỉ thị số 228-CT/TW về việc lãnh đạo tổng tuyển cử trong cả nước vào thời gian nào?", "options": ["Ngày 15/11/1975.", "Ngày 21/11/1975.", "Ngày 02/01/1976.", "Ngày 03/01/1976."], "ans": "D"}, {"stt": "47", "q": "Cuộc kháng chiến chống xâm lược của nhân dân Nam bộ bắt đầu vào thời gian nào?", "options": ["Ngày 23/11/1945.", "Ngày 23/09/1945.", "Ngày 19/12/1946.", "Ngày 10/12/1946."], "ans": "B"}, {"stt": "48", "q": "Hội nghị văn hoá toàn quốc lần thứ hai diễn ra thời gian nào?", "options": ["Tháng 07/1948.", "Tháng 08/1948.", "Tháng 07/1949.", "Tháng 08/1949."], "ans": "A"}, {"stt": "49", "q": "Cuộc tổng tiến công và nổi dậy Xuân 1975 bắt đầu bằng chiến dịch nào? Thời gian nào?", "options": ["Chiến dịch Tây Nguyên, 10/03/1975.", "Chiến dịch Huế, Đà Nẵng, 21/03/1975.", "Chiến dịch Hồ Chí Minh, 26/04/1975.", "Chiến dịch Sài Gòn, Gia Định 30/04/1975."], "ans": "A"}, {"stt": "50", "q": "Trong tiến trình cách mạng từ năm 1930 đến 1951, Đảng ta đã đề ra bao nhiêu Cương lĩnh chính trị?", "options": ["Ba Cương lĩnh vào năm 1930, 1945, 1951.", "Hai cương lĩnh vào năm 1930, 1945.", "Ba Cương lĩnh vào năm 1930, 1951.", "Hai cương lĩnh vào năm 1930."], "ans": "C"}, {"stt": "51", "q": "Chọn đáp án đúng nhất. Phong trào Đồng Khởi diễn ra ở đâu? Thời gian nào?", "options": ["Bến Tre, ngày 17/01/1960.", "Trà Vinh, ngày 17/01/1960.", "Vĩnh Long, ngày 17/02/1960.", "Sóc Trăng, ngày 17/01/1959."], "ans": "A"}, {"stt": "52", "q": "Tác phẩm “Kháng chiến nhất định thắng lợi” được phát hành khi nào? Ai là tác giả?", "options": ["Tháng 07/1947, Hồ Chí Minh.", "Tháng 08/1947, Trường Chinh.", "Tháng 09/1947, Nguyễn Văn Linh.", "Tháng 10/1947, Lê Duẫn."], "ans": "B"}, {"stt": "53", "q": "Bộ Chính trị thông qua phương án mở chiến dịch Điện Biên Phủ vào thời gian nào? Ai là chỉ huy?", "options": ["Ngày 06/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 20/11/1953, Đại tướng Lê Đức Anh.", "Ngày 03/12/1953, Đại tướng Võ Nguyên Giáp.", "Ngày 28/09/1953, Đại tướng Văn Tiến Dũng."], "ans": "A"}, {"stt": "54", "q": "Chỉ thị Nhật - Pháp bắn nhau và hành động của chúng ta phản ánh nội dung của:", "options": ["Hội nghị Ban Thường vụ Trung ương Đảng họp tháng 03/1945.", "Hội nghị Ban Chấp hành Trung ương Đảng họp tháng 05/1941.", "Hội nghị Ban Thường vụ Trung ương Đảng họp tháng 02/1943.", "Hội nghị quân sự cách mạng Bắc kỳ họp tháng 04/1945."], "ans": "A"}, {"stt": "55", "q": "Kế hoạch 5 năm lần thứ nhất, bước đầu xây dựng cơ sở vật chất CNXH trong thời gian là:", "options": ["Từ năm 1956 đến 1960.", "Từ năm 1961 đến 1965.", "Từ năm 1966 đến 1970.", "Từ năm 1976 đến 1980."], "ans": "B"}, {"stt": "56", "q": "Trận “Điện Biên Phủ trên không” diễn ra trong bao nhiêu ngày đêm? Ở Đâu?", "options": ["12 ngày đêm, từ ngày 15 đến 27/10/1970, tại Điện Biên Phủ.", "12 ngày đêm, từ ngày 18 đến 30/12/1972, tại Hà Nội.", "12 ngày đêm, từ ngày 18 đến 30/12/1972, tại bệnh viện Bạch Mai.", "12 ngày đêm, từ ngày 17 đến 29/11/1971, tại Hải Phòng."], "ans": "B"}, {"stt": "57", "q": "Việt Nam bình thường hóa quan hệ ngoại giao với Mĩ năm:", "options": ["1995", "1990.", "1997.", "2000."], "ans": "A"}, {"stt": "58", "q": "Đảng Cộng sản Việt Nam là Đảng cầm quyền duy nhất lãnh đạo Nhà nước và xã hội từ thời gian nào?", "options": ["Tháng 02/1930.", "Tháng 12/1954.", "Tháng 08/1945.", "Tháng 04/1975."], "ans": "C"}, {"stt": "59", "q": "Tổ chức Cộng sản đoàn được Nguyễn ái Quốc lập ra vào thời gian nào?", "options": ["Tháng 11/1924.", "Tháng 12/1924.", "Tháng 02/1925.", "Tháng 01/1925."], "ans": "C"}, {"stt": "60", "q": "Pháp tiến hành khai thác thuộc địa lần thứ hai ở Việt Nam thời gian nào?", "options": ["Từ 1897 đến 1914.", "Từ 1915 đến 1918.", "Từ 1930 đến 1945.", "Từ 1919 đến 1929."], "ans": "D"}, {"stt": "61", "q": "Tác phẩm: “Sơ thảo lịch sử phong trào cộng sản Đông Dương”, ra đời thời gian nào?", "options": ["Năm 1919.", "Năm 1942.", "Năm 1933.", "Năm 1943."], "ans": "C"}, {"stt": "62", "q": "Khi nào phong trào công nhân Việt Nam hoàn toàn trở thành một phong trào tự giác?", "options": ["Năm 1920 (Công hội đỏ ở Sài Gòn được thành lập).", "Năm 1929 (ba tổ chức cộng sản trong nước ra đời).", "Năm 1925 (cuộc bãi công tại nhà máy Ba Son).", "Năm 1930 (Đảng Cộng sản Việt Nam thành lập)."], "ans": "C"}, {"stt": "63", "q": "Thời gian hoàn thiện việc hợp nhất các tổ chức Cộng sản trong Đảng Cộng sản Việt Nam là:", "options": ["Ngày 03/02/1930.", "Ngày 22/02/1930.", "Ngày 20/02/1930.", "Ngày 24/02/1930."], "ans": "D"}, {"stt": "64", "q": "Hội nghị lần thứ 8 Ban chấp hành Trung ương Đảng diễn ra thời gian nào? Ai là Tổng Bí thư?", "options": ["Tháng 08/1941, Hà Huy Tập.", "Tháng 08/1941, Hồ Chí Minh.", "Tháng 05/1941, Nguyễn Văn Cừ.", "Tháng 05/1941, Trường Chinh."], "ans": "D"}, {"stt": "65", "q": "Tổ chức cộng sản Đảng đầu tiên ở Việt Nam được thành lập vào thời gian nào?", "options": ["Ngày 25/03/1929.", "Ngày 15/11/1929.", "Ngày 17/06/1929.", "Ngày 28/12/1929."], "ans": "C"}, {"stt": "66", "q": "Hiệp định về chấm dứt chiến tranh, lập lại hoà bình ở Việt Nam được ký thời gian nào?", "options": ["Ngày 27/01/1973.", "Ngày 27/02/1973.", "Ngày 27/03/1973.", "Ngày 27/04/1975."], "ans": "A"}, {"stt": "67", "q": "Chiến thắng Điện Biên Phủ lịch sử diễn ra trong bao nhiêu ngày đêm?", "options": ["56 ngày đêm.", "30 ngày đêm.", "55 ngày đêm.", "75 ngày đêm."], "ans": "A"}, {"stt": "68", "q": "Tổng tuyển cử bầu Quốc hội chung của nước Việt Nam bắt đầu thời gian nào?", "options": ["Ngày 03/01/1976.", "Ngày 25/04/1976.", "Ngày 30/04/1976.", "Ngày 01/05/1976."], "ans": "B"}, {"stt": "69", "q": "Hội nghị nào của Đảng thông qua cuộc Tổng tấn công và nổi dậy Tết Mậu Thân 1968?", "options": ["Hội nghị Trung ương 13, tháng 01/1967.", "Hội nghị Trung ương 14, tháng 01/1968.", "Hội nghị Bộ Chính trị, tháng 12/1967.", "Hội nghị Bộ Chính trị, tháng 10/1967."], "ans": "B"}, {"stt": "70", "q": "Tổ chức An Nam Cộng sản Đảng được thành lập vào thời gian nào?", "options": ["Tháng 10/1929.", "Tháng 09/1929.", "Tháng 08/1929.", "Tháng 11/1929."], "ans": "C"}, {"stt": "71", "q": "Quân ta tiếp quản Thủ đô Hà Nội vào thời gian nào?", "options": ["Ngày 01/10/1954.", "Ngày 10/10/1954.", "Ngày 16/05/1955.", "Ngày 10/10/1955."], "ans": "B"}, {"stt": "72", "q": "Uỷ ban khởi nghĩa toàn quốc được thành lập vào thời gian nào?", "options": ["Ngày 12/08/1945.", "Ngày 14/08/1945.", "Ngày 13/08/1945.", "Ngày 15/08/1945."], "ans": "C"}, {"stt": "73", "q": "Trung ương Đảng ra chỉ thị Toàn dân kháng chiến vào thời gian nào?", "options": ["Ngày 25/11/1946.", "Ngày 12/12/1946.", "Ngày 16/12/1946.", "Ngày 18/12/1946."], "ans": "B"}, {"stt": "74", "q": "Theo chỉ đạo của Quốc tế Cộng sản, Ban Chỉ huy ở ngoài của Đảng được thành lập vào thời gian nào? Ai đứng đầu?", "options": ["Đầu năm 1933, Phùng Chí Kiên.", "Đầu năm 1934, Lê Hồng Phong.", "Cuối năm 1933, Hà Huy Tập.", "Đầu năm 1935, Nguyễn Văn Cừ."], "ans": "B"}, {"stt": "75", "q": "Cuộc tổng tiến công và nổi dậy giải phóng Sài Gòn trước tháng 05/1975 được đề ra trong:", "options": ["Hội nghị Bộ Chính trị (18/03/1975).", "Hội nghị Bộ Chính trị (từ 30/09 đến 08/10/1974).", "Hội nghị Trung ương 21 (Khoá III – 07/1973).", "Hội nghị Bộ Chính trị (từ 08/12/1974 đến 07/01/1975)."], "ans": "A"}, {"stt": "76", "q": "Thời gian hoàn tất quá trình thành lập Đông Dương Cộng sản Liên đoàn là khi nào?", "options": ["Tháng 11/1929.", "Tháng 12/1929.", "Tháng 10/1929.", "Tháng 09/1929."], "ans": "B"}, {"stt": "77", "q": "Mỹ bắt đầu đưa quân viễn chinh Mỹ trực tiếp tham chiến ở Việt Nam thời gian nào? Ở đâu?", "options": ["Ngày 01/11/1963, tại Sài Gòn.", "Ngày 05/08/1964, tại Hải Phòng.", "Ngày 05/08/1964, tại Hà Nội.", "Ngày 08/03/1965, tại Đà Nẵng."], "ans": "D"}, {"stt": "78", "q": "Để gạt mũi nhọn tiến công kẻ thù, Đảng Cộng sản Đông Dương đã thông cáo tự giải tán vào thời gian nào? Lấy tên gọi là gì?", "options": ["Ngày 02/09/1945; Hội nghiên cứu lý luận Đông Dương.", "Ngày 25/11/1945; Hội nghiên cứu chủ nghĩa Mác – Lênin.", "Ngày 03/02/1946; Hội Những người Lao động Việt Nam.", "Ngày 11/11/1945; Hội nghiên cứu Chủ nghĩa Mác ở Đông Dương."], "ans": "D"}, {"stt": "79", "q": "Ban nghiên cứu Lịch sử Đảng Trung ương được thành lập vào thời gian nào?", "options": ["Năm 1943.", "Năm 1960.", "Năm 1986", "Năm 1962."], "ans": "D"}, {"stt": "80", "q": "Chính phủ lâm thời Việt Nam Dân chủ Cộng hoà họp phiên đầu tiên vào thời gian nào?", "options": ["Ngày 01/01/1946.", "Ngày 05/09/1945.", "Ngày 20/10/1945.", "Ngày 03/09/1945."], "ans": "D"}, {"stt": "81", "q": "Bản Đề cương Cách mạng miền Nam do ai chủ trì dự thảo? Vào thời gian nào?", "options": ["Phạm Hùng, tháng 07/1954.", "Lê Duẩn, tháng 08/1956.", "Lê Đức Thọ, tháng 08/1955.", "Phạm Văn Đồng, tháng 09/1957."], "ans": "B"}, {"stt": "82", "q": "Mặt trận Việt Minh ra Tuyên ngôn về sự ra đời của Mặt trận vào thời gian nào?", "options": ["Tháng 05/1941.", "Tháng 06/1941.", "Tháng 10/1941.", "Tháng 11/1941."], "ans": "C"}], "NGAY DEM": [{"stt": "3", "q": "Chiến dịch Thu Đông 1947 diễn ra trong tổng thời gian:", "options": ["30 ngày đêm.", "75 ngày đêm.", "55 ngày đêm.", "56 ngày đêm."], "ans": "B"}, {"stt": "196", "q": "Chiến dịch tiến công quy mô lớn của Đảng thành công phá kế hoạch phong toả của tướng Rơve diễn ra trong:", "options": ["75 ngày đêm.", "55 ngày đêm.", "56 ngày đêm.", "30 ngày đêm."], "ans": "D"}, {"stt": "246", "q": "Chiến thắng Điện Biên Phủ lịch sử diễn ra trong bao nhiêu ngày đêm?", "options": ["56 ngày đêm.", "30 ngày đêm.", "55 ngày đêm.", "75 ngày đêm."], "ans": "A"}, {"stt": "274", "q": "Cuộc tổng tiến công và nổi dậy Xuân 1975 diễn ra trong bao nhiêu ngày đêm?", "options": ["81 ngày đêm.", "75 ngày đêm.", "56 ngày đêm.", "55 ngày đêm."], "ans": "D"}, {"stt": "299", "q": "Cuộc tổng giao chiến mở đầu kháng chiến chống Pháp của quân và dân ta ở Hà Nội đã diễn ra trong:", "options": ["55 ngày đêm.", "12 ngày đêm.", "30 ngày đêm.", "56 ngày đêm."], "ans": "C"}]};
+
+    const SECTION_META = {
+      "CAU HOI": { label: "Câu hỏi tổng hợp", icon: "📚", desc: "Ngân hàng câu hỏi trắc nghiệm chính" },
+      "DANH TU RIENG": { label: "Danh từ riêng", icon: "👤", desc: "Nhân vật, địa danh, tổ chức lịch sử" },
+      "NGAY THANG NAM": { label: "Ngày tháng năm", icon: "📅", desc: "Các mốc thời gian, sự kiện lịch sử" },
+      "NGAY DEM": { label: "Ngày đêm", icon: "⏳", desc: "Thời gian diễn ra các chiến dịch" }
+    };
+
+    const LETTERS = ["A", "B", "C", "D"];
+
+    let currentMode = "study";
+    let studySection = "CAU HOI";
+    let practiceSection = "CAU HOI";
+    let activeQuiz = null;
+    let timerInterval = null;
+    let mistakesMap = JSON.parse(localStorage.getItem("lsd_mistakes_v1") || "{}");
+
+    function initTheme() {
+      const saved = localStorage.getItem("lsd_theme");
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === "dark" || (!saved && prefersDark)) {
+        document.documentElement.classList.add("dark");
+        document.getElementById("theme-icon").innerText = "☀️";
+      } else {
+        document.documentElement.classList.remove("dark");
+        document.getElementById("theme-icon").innerText = "🌙";
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("lsd_theme", isDark ? "dark" : "light");
+      document.getElementById("theme-icon").innerText = isDark ? "☀️" : "🌙";
+    }
+
+    function highlightDates(text) {
+      if (!text) return "";
+      return text.replace(/(\d{1,2}\/\d{1,2}\/\d{4}|\d{1,2}\/\d{4}|(?:năm|tháng|ngày)\s+\d{1,4}|\d{1,3}\s+ngày\s+đêm)/gi, '<span class="kw-badge">$1</span>');
+    }
+
+    function updateMistakeCounter() {
+      const count = Object.keys(mistakesMap).length;
+      const badge = document.getElementById("mistake-count");
+      badge.innerText = count;
+      if (count === 0) {
+        badge.classList.remove("bg-rose-500", "text-white");
+        badge.classList.add("bg-slate-200", "dark:bg-slate-700", "text-slate-600", "dark:text-slate-300");
+      } else {
+        badge.classList.add("bg-rose-500", "text-white");
+        badge.classList.remove("bg-slate-200", "dark:bg-slate-700", "text-slate-600", "dark:text-slate-300");
+      }
+    }
+
+    function saveMistakes() {
+      localStorage.setItem("lsd_mistakes_v1", JSON.stringify(mistakesMap));
+      updateMistakeCounter();
+    }
+
+    function switchMode(mode) {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      currentMode = mode;
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("bg-white", "dark:bg-slate-900", "text-indigo-700", "dark:text-indigo-300", "shadow-sm");
+        btn.classList.add("text-slate-600", "dark:text-slate-300", "hover:text-slate-900", "dark:hover:text-white");
+      });
+      const activeBtn = document.getElementById("nav-" + mode);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-white", "dark:bg-slate-900", "text-indigo-700", "dark:text-indigo-300", "shadow-sm");
+        activeBtn.classList.remove("text-slate-600", "dark:text-slate-300", "hover:text-slate-900", "dark:hover:text-white");
+      }
+
+      ["study", "practice", "exam", "quiz-runner", "mistakes"].forEach(v => {
+        document.getElementById("view-" + v).classList.add("hidden");
+      });
+
+      document.getElementById("view-" + mode).classList.remove("hidden");
+
+      if (mode === "study") renderStudy();
+      if (mode === "practice") renderPracticeSetup();
+      if (mode === "mistakes") renderMistakes();
+    }
+
+    // ==================== STUDY MODE ====================
+    function initStudyTabs() {
+      const container = document.getElementById("study-section-tabs");
+      container.innerHTML = Object.keys(QUIZ_DATA).map(sec => {
+        const count = QUIZ_DATA[sec].length;
+        const meta = SECTION_META[sec] || { label: sec, icon: "📄" };
+        const isActive = sec === studySection;
+        return `
+          <button onclick="selectStudySection('${sec}')"
+            class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all flex items-center gap-1.5 ${
+              isActive
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                : "bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+            }">
+            <span>${meta.icon}</span>
+            <span>${meta.label}</span>
+            <span class="px-1.5 py-0.2 rounded-md text-[11px] ${isActive ? 'bg-white/20 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}">${count}</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function selectStudySection(sec) {
+      studySection = sec;
+      initStudyTabs();
+      renderStudy();
+    }
+
+    function renderStudy() {
+      initStudyTabs();
+      const keyword = document.getElementById("study-search").value.trim().toLowerCase();
+      const hideAns = document.getElementById("study-hide-ans").checked;
+      const onlyAns = document.getElementById("study-only-ans").checked;
+
+      const list = QUIZ_DATA[studySection] || [];
+      const filtered = list.filter(item => {
+        if (!keyword) return true;
+        return (
+          item.stt.toLowerCase().includes(keyword) ||
+          item.q.toLowerCase().includes(keyword) ||
+          item.options.some(o => o.toLowerCase().includes(keyword))
+        );
+      });
+
+      const meta = SECTION_META[studySection] || { label: studySection };
+      document.getElementById("study-stats").innerHTML = `Đang hiển thị <strong class="text-slate-800 dark:text-slate-200">${filtered.length}</strong> / ${list.length} câu thuộc chuyên đề <strong>${meta.label}</strong>`;
+
+      const container = document.getElementById("study-list");
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white dark:bg-slate-900 p-10 rounded-3xl border border-slate-200 dark:border-slate-800 text-center text-slate-500 dark:text-slate-400">
+            <div class="text-3xl mb-2">🔍</div>
+            <p class="font-semibold text-slate-700 dark:text-slate-200">Không tìm thấy câu hỏi nào khớp với "${keyword}"</p>
+            <p class="text-xs mt-1">Thử tìm bằng từ khóa ngắn hơn hoặc mốc năm (ví dụ: 1930, 1945, Đại hội VI...)</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((item) => {
+        const ansIdx = LETTERS.indexOf(item.ans);
+        const optionsHtml = item.options.map((opt, oIdx) => {
+          if (!opt) return "";
+          const isCorrect = oIdx === ansIdx;
+          if (onlyAns && !isCorrect) return "";
+
+          let cls = "border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300";
+          let letterCls = "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700";
+          if (isCorrect && !hideAns) {
+            cls = "study-highlight text-slate-950 dark:text-amber-50 font-semibold shadow-sm";
+            letterCls = "bg-amber-500 text-white border-amber-500";
+          }
+          return `
+            <div data-correct="${isCorrect}" class="study-opt p-3 rounded-2xl border ${cls} text-sm flex items-start gap-3 transition-all">
+              <span class="study-letter w-6 h-6 rounded-lg border ${letterCls} text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">${LETTERS[oIdx]}</span>
+              <span class="leading-relaxed">${highlightDates(opt)}</span>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <div onclick="revealStudyCard(this)" class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 transition hover:border-indigo-300 dark:hover:border-indigo-700 ${hideAns ? 'cursor-pointer select-none' : ''}">
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="flex items-start gap-3">
+                <span class="px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/70 font-extrabold text-xs shrink-0 mt-0.5">Câu ${item.stt}</span>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base leading-relaxed">${highlightDates(item.q)}</h3>
+              </div>
+              ${
+                item.ans
+                  ? `<span class="study-badge px-2.5 py-1 rounded-xl text-xs font-extrabold shrink-0 ${
+                      hideAns
+                        ? "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+                        : "bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-300/70 dark:border-amber-700/60"
+                    }">${hideAns ? "👁️ Lật đáp án" : "Đáp án: " + item.ans}</span>`
+                  : `<span class="px-2.5 py-1 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">Chưa đánh dấu</span>`
+              }
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function revealStudyCard(card) {
+      if (!document.getElementById("study-hide-ans").checked) return;
+      card.querySelectorAll('.study-opt[data-correct="true"]').forEach(el => {
+        el.classList.remove("border-slate-200/90", "dark:border-slate-800", "bg-slate-50/60", "dark:bg-slate-800/40", "text-slate-700", "dark:text-slate-300");
+        el.classList.add("study-highlight", "text-slate-950", "dark:text-amber-50", "font-semibold", "shadow-sm");
+        const l = el.querySelector(".study-letter");
+        if (l) {
+          l.className = "study-letter w-6 h-6 rounded-lg border bg-amber-500 text-white border-amber-500 text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5";
+        }
+      });
+      const badge = card.querySelector(".study-badge");
+      if (badge) {
+        badge.className = "study-badge px-2.5 py-1 rounded-xl text-xs font-extrabold shrink-0 bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-300/70 dark:border-amber-700/60";
+        const correctOpt = card.querySelector('.study-opt[data-correct="true"] .study-letter');
+        if (correctOpt) {
+          badge.innerText = "Đáp án: " + correctOpt.innerText.trim();
+        }
+      }
+    }
+
+    // ==================== PRACTICE SETUP ====================
+    function renderPracticeSetup() {
+      const grid = document.getElementById("practice-section-grid");
+      grid.innerHTML = Object.keys(QUIZ_DATA).map(sec => {
+        const count = QUIZ_DATA[sec].length;
+        const meta = SECTION_META[sec] || { label: sec, icon: "📄", desc: "" };
+        const isSelected = sec === practiceSection;
+        return `
+          <div onclick="selectPracticeSection('${sec}')"
+            class="p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+              isSelected
+                ? "border-indigo-600 dark:border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/40 shadow-sm"
+                : "border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-700"
+            }">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                <span class="text-base">${meta.icon}</span> ${meta.label}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}">${count} câu</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">${meta.desc}</p>
+          </div>
+        `;
+      }).join("");
+
+      const total = QUIZ_DATA[practiceSection].length;
+      document.getElementById("practice-max-label").innerText = total;
+      document.getElementById("practice-from").max = total;
+      document.getElementById("practice-to").max = total;
+      if (document.getElementById("practice-all-range").checked) {
+        document.getElementById("practice-from").value = 1;
+        document.getElementById("practice-to").value = total;
+      }
+      updatePracticeCountLimit();
+    }
+
+    function selectPracticeSection(sec) {
+      practiceSection = sec;
+      const total = QUIZ_DATA[sec].length;
+      document.getElementById("practice-from").value = 1;
+      document.getElementById("practice-to").value = total;
+      renderPracticeSetup();
+    }
+
+    function togglePracticeRange() {
+      const isAll = document.getElementById("practice-all-range").checked;
+      const box = document.getElementById("practice-range-inputs");
+      const total = QUIZ_DATA[practiceSection].length;
+      if (isAll) {
+        box.classList.add("opacity-50", "pointer-events-none");
+        document.getElementById("practice-from").value = 1;
+        document.getElementById("practice-to").value = total;
+      } else {
+        box.classList.remove("opacity-50", "pointer-events-none");
+      }
+      updatePracticeCountLimit();
+    }
+
+    function updatePracticeCountLimit() {
+      const total = QUIZ_DATA[practiceSection].length;
+      let fromVal = parseInt(document.getElementById("practice-from").value) || 1;
+      let toVal = parseInt(document.getElementById("practice-to").value) || total;
+      fromVal = Math.max(1, Math.min(fromVal, total));
+      toVal = Math.max(fromVal, Math.min(toVal, total));
+
+      const available = toVal - fromVal + 1;
+      document.getElementById("practice-available-qty").innerText = available;
+      const qtyInput = document.getElementById("practice-qty");
+      qtyInput.max = available;
+      if (parseInt(qtyInput.value) > available) {
+        qtyInput.value = available;
+      }
+    }
+
+    function setPracticeMaxQty() {
+      const available = parseInt(document.getElementById("practice-available-qty").innerText) || 1;
+      document.getElementById("practice-qty").value = available;
+    }
+
+    // ==================== QUIZ ENGINE ====================
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildQuizItems(rawItems, qty, shuffleQ, shuffleOpt) {
+      const validItems = rawItems.filter(it => it.ans && LETTERS.includes(it.ans));
+      let pool = shuffleQ ? shuffleArray(validItems) : [...validItems];
+      pool = pool.slice(0, Math.min(qty, pool.length));
+
+      return pool.map((item, idx) => {
+        const origAnsIdx = LETTERS.indexOf(item.ans);
+        let optPairs = item.options
+          .map((txt, i) => ({ txt, isCorrect: i === origAnsIdx }))
+          .filter(o => o.txt !== "");
+
+        if (shuffleOpt) {
+          optPairs = shuffleArray(optPairs);
+        }
+
+        const correctLetterIdx = optPairs.findIndex(o => o.isCorrect);
+        return {
+          index: idx,
+          stt: item.stt,
+          q: item.q,
+          options: optPairs.map(o => o.txt),
+          correctIdx: correctLetterIdx,
+          userIdx: null,
+          flagged: false,
+          rawItem: item
+        };
+      });
+    }
+
+    function startQuiz(type, customList = null) {
+      let items = [];
+      let title = "";
+      let badge = "";
+      let instantMode = false;
+      let durationMins = 0;
+
+      if (type === "mistakes") {
+        items = buildQuizItems(customList, customList.length, true, false);
+        title = `Ôn lại ${items.length} câu đã làm sai`;
+        badge = "SỔ TAY CÂU SAI";
+        instantMode = true;
+      } else if (type === "practice") {
+        const total = QUIZ_DATA[practiceSection].length;
+        const isAll = document.getElementById("practice-all-range").checked;
+        let fromVal = isAll ? 1 : (parseInt(document.getElementById("practice-from").value) || 1);
+        let toVal = isAll ? total : (parseInt(document.getElementById("practice-to").value) || total);
+        fromVal = Math.max(1, Math.min(fromVal, total));
+        toVal = Math.max(fromVal, Math.min(toVal, total));
+
+        const sliced = QUIZ_DATA[practiceSection].slice(fromVal - 1, toVal);
+        const qty = parseInt(document.getElementById("practice-qty").value) || sliced.length;
+        const shuffleQ = document.getElementById("practice-shuffle-q").checked;
+        const shuffleOpt = document.getElementById("practice-shuffle-opt").checked;
+        instantMode = document.getElementById("practice-instant-mode").value === "instant";
+        const meta = SECTION_META[practiceSection] || { label: practiceSection };
+
+        items = buildQuizItems(sliced, qty, shuffleQ, shuffleOpt);
+        title = `${meta.label} (Câu ${fromVal}–${toVal} • ${items.length} câu)`;
+        badge = "TỰ KIỂM TRA";
+      } else if (type === "exam") {
+        const pool = QUIZ_DATA["CAU HOI"];
+        const shuffleOpt = document.getElementById("exam-shuffle-opt").value === "yes";
+        durationMins = parseInt(document.getElementById("exam-duration").value) || 0;
+        items = buildQuizItems(pool, 50, true, shuffleOpt);
+        title = "Đề Thi Thử Ngẫu Nhiên 50 Câu";
+        badge = "THI THỬ 50 CÂU";
+        instantMode = false;
+      }
+
+      if (items.length === 0) {
+        alert("Không có câu hỏi hợp lệ trong phạm vi đã chọn.");
+        return;
+      }
+
+      activeQuiz = {
+        type,
+        title,
+        badge,
+        instantMode,
+        submitted: false,
+        items,
+        filter: "all"
+      };
+
+      ["study", "practice", "exam", "mistakes"].forEach(v => document.getElementById("view-" + v).classList.add("hidden"));
+      document.getElementById("view-quiz-runner").classList.remove("hidden");
+      document.getElementById("quiz-result-banner").classList.add("hidden");
+      document.getElementById("btn-submit-quiz").classList.remove("hidden");
+
+      document.getElementById("runner-badge").innerText = badge;
+      document.getElementById("runner-title").innerText = title;
+      document.getElementById("runner-total-count").innerText = items.length;
+      document.getElementById("runner-answered-count").innerText = "0";
+      document.getElementById("runner-progress-bar").style.width = "0%";
+
+      if (timerInterval) clearInterval(timerInterval);
+      const timerBox = document.getElementById("runner-timer-box");
+      if (durationMins > 0) {
+        timerBox.classList.remove("hidden");
+        let secondsLeft = durationMins * 60;
+        updateTimerDisplay(secondsLeft);
+        timerInterval = setInterval(() => {
+          secondsLeft--;
+          updateTimerDisplay(secondsLeft);
+          if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Hết thời gian làm bài! Hệ thống tự động nộp bài.");
+            submitQuiz(true);
+          }
+        }, 1000);
+      } else {
+        timerBox.classList.add("hidden");
+      }
+
+      renderQuizRunner();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updateTimerDisplay(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, "0");
+      const s = (sec % 60).toString().padStart(2, "0");
+      document.getElementById("runner-timer").innerText = `${m}:${s}`;
+    }
+
+    function toggleFlagQuestion(qIdx) {
+      if (!activeQuiz || activeQuiz.submitted) return;
+      activeQuiz.items[qIdx].flagged = !activeQuiz.items[qIdx].flagged;
+      renderQuizRunner();
+    }
+
+    function renderQuizRunner() {
+      const container = document.getElementById("quiz-questions-container");
+      const palette = document.getElementById("quiz-palette");
+
+      const visibleItems = activeQuiz.items.filter(it => {
+        if (activeQuiz.filter === "wrong") {
+          return it.userIdx !== it.correctIdx;
+        }
+        return true;
+      });
+
+      container.innerHTML = visibleItems.map(item => {
+        const showFeedback = activeQuiz.submitted || (activeQuiz.instantMode && item.userIdx !== null);
+
+        const optionsHtml = item.options.map((opt, oIdx) => {
+          let cls = "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 text-slate-800 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30";
+          let badgeCls = "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700";
+          let icon = "";
+
+          if (showFeedback) {
+            cls = "border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/40 text-slate-500 dark:text-slate-400 disabled-opt cursor-default";
+            if (oIdx === item.correctIdx) {
+              cls = "opt-correct text-emerald-950 dark:text-emerald-100 font-semibold disabled-opt cursor-default";
+              badgeCls = "bg-emerald-500 text-white border-emerald-500";
+              icon = "✅";
+            } else if (oIdx === item.userIdx && item.userIdx !== item.correctIdx) {
+              cls = "opt-wrong text-rose-950 dark:text-rose-100 font-semibold disabled-opt cursor-default";
+              badgeCls = "bg-rose-500 text-white border-rose-500";
+              icon = "❌";
+            }
+          } else {
+            cls += " cursor-pointer";
+            if (oIdx === item.userIdx) {
+              cls = "opt-selected text-indigo-950 dark:text-indigo-100 font-semibold cursor-pointer";
+              badgeCls = "bg-indigo-600 text-white border-indigo-600";
+            }
+          }
+
+          return `
+            <div onclick="selectOption(${item.index}, ${oIdx})"
+              class="option-card p-3.5 sm:p-4 rounded-2xl border-2 ${cls} text-sm flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <span class="w-7 h-7 rounded-xl border ${badgeCls} text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5 transition-colors">${LETTERS[oIdx]}</span>
+                <span class="leading-relaxed pt-0.5">${opt}</span>
+              </div>
+              <span class="shrink-0 text-base">${icon}</span>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <div id="q-card-${item.index}" class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border ${item.flagged && !activeQuiz.submitted ? 'border-amber-400 dark:border-amber-500' : 'border-slate-200/80 dark:border-slate-800'} p-5 sm:p-6 transition-colors">
+            <div class="flex items-start justify-between gap-3 mb-4">
+              <div class="flex items-start gap-3">
+                <span class="px-3 py-1 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-extrabold text-xs shrink-0 mt-0.5">Câu ${item.index + 1}</span>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base leading-relaxed">${item.q}</h4>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                ${!activeQuiz.submitted ? `
+                  <button onclick="toggleFlagQuestion(${item.index})" title="Đánh dấu phân vân để xem lại"
+                    class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition ${
+                      item.flagged
+                        ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-amber-600 border-slate-200 dark:border-slate-700'
+                    }">
+                    🚩 ${item.flagged ? 'Đã gắn cờ' : 'Phân vân'}
+                  </button>
+                ` : ''}
+                <span class="text-xs font-medium text-slate-400 hidden sm:inline">#${item.stt}</span>
+              </div>
+            </div>
+            <div class="space-y-2.5">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      palette.innerHTML = activeQuiz.items.map(item => {
+        const showFeedback = activeQuiz.submitted || (activeQuiz.instantMode && item.userIdx !== null);
+        let btnCls = "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700";
+        if (showFeedback) {
+          if (item.userIdx === item.correctIdx) {
+            btnCls = "bg-emerald-500 text-white border-emerald-600 shadow-sm";
+          } else if (item.userIdx !== null) {
+            btnCls = "bg-rose-500 text-white border-rose-600 shadow-sm";
+          } else {
+            btnCls = "bg-amber-200 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-700";
+          }
+        } else if (item.flagged) {
+          btnCls = "bg-amber-400 text-slate-950 border-amber-500 shadow-sm";
+        } else if (item.userIdx !== null) {
+          btnCls = "bg-indigo-600 text-white border-indigo-700 shadow-sm";
+        }
+
+        return `
+          <button onclick="scrollToQuestion(${item.index})"
+            class="h-9 rounded-xl border text-xs font-extrabold transition-all ${btnCls}">
+            ${item.index + 1}
+          </button>
+        `;
+      }).join("");
+
+      const answered = activeQuiz.items.filter(i => i.userIdx !== null).length;
+      const total = activeQuiz.items.length;
+      document.getElementById("runner-answered-count").innerText = answered;
+      document.getElementById("runner-progress-bar").style.width = `${Math.round((answered / total) * 100)}%`;
+    }
+
+    function selectOption(qIdx, optIdx) {
+      if (!activeQuiz || activeQuiz.submitted) return;
+      const item = activeQuiz.items[qIdx];
+      if (activeQuiz.instantMode && item.userIdx !== null) return;
+
+      item.userIdx = optIdx;
+
+      if (activeQuiz.instantMode && optIdx !== item.correctIdx) {
+        const key = item.rawItem.q;
+        mistakesMap[key] = item.rawItem;
+        saveMistakes();
+      } else if (activeQuiz.instantMode && optIdx === item.correctIdx && activeQuiz.type === "mistakes") {
+        delete mistakesMap[item.rawItem.q];
+        saveMistakes();
+      }
+
+      renderQuizRunner();
+    }
+
+    function scrollToQuestion(idx) {
+      const el = document.getElementById("q-card-" + idx);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function submitQuiz(auto = false) {
+      if (!activeQuiz || activeQuiz.submitted) return;
+      const unanswered = activeQuiz.items.filter(i => i.userIdx === null).length;
+      if (!auto && unanswered > 0) {
+        const ok = confirm(`Bạn vẫn còn ${unanswered} câu chưa chọn đáp án. Bạn có chắc chắn muốn nộp bài không?`);
+        if (!ok) return;
+      }
+
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      activeQuiz.submitted = true;
+      let correctCount = 0;
+
+      activeQuiz.items.forEach(item => {
+        if (item.userIdx === item.correctIdx) {
+          correctCount++;
+          if (activeQuiz.type === "mistakes") {
+            delete mistakesMap[item.rawItem.q];
+          }
+        } else {
+          mistakesMap[item.rawItem.q] = item.rawItem;
+        }
+      });
+      saveMistakes();
+
+      const total = activeQuiz.items.length;
+      const wrongCount = total - correctCount;
+      const score10 = ((correctCount / total) * 10).toFixed(2);
+
+      document.getElementById("btn-submit-quiz").classList.add("hidden");
+      document.getElementById("quiz-result-banner").classList.remove("hidden");
+      document.getElementById("result-score-text").innerText = `Điểm số: ${score10} / 10`;
+      document.getElementById("result-detail-text").innerText = `Trả lời đúng ${correctCount}/${total} câu • Sai/Bỏ trống ${wrongCount} câu`;
+
+      renderQuizRunner();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function filterResultQuestions(mode) {
+      if (!activeQuiz) return;
+      activeQuiz.filter = mode;
+      renderQuizRunner();
+    }
+
+    function retryCurrentQuiz() {
+      if (!activeQuiz) return;
+      if (activeQuiz.type === "mistakes") {
+        practiceMistakes();
+      } else {
+        startQuiz(activeQuiz.type);
+      }
+    }
+
+    function exitQuiz() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      const backMode = activeQuiz ? (activeQuiz.type === "mistakes" ? "mistakes" : activeQuiz.type) : "study";
+      switchMode(backMode);
+    }
+
+    // ==================== MISTAKES NOTEBOOK ====================
+    function renderMistakes() {
+      const list = Object.values(mistakesMap);
+      const container = document.getElementById("mistakes-list");
+      const btn = document.getElementById("btn-practice-mistakes");
+
+      if (list.length === 0) {
+        btn.classList.add("opacity-50", "pointer-events-none");
+        container.innerHTML = `
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-soft">
+            <div class="text-5xl mb-3">🎉</div>
+            <p class="font-extrabold text-lg text-slate-800 dark:text-white">Sổ tay trống — Bạn chưa có câu sai nào!</p>
+            <p class="text-sm mt-1.5 max-w-md mx-auto">Trong quá trình Tự kiểm tra hoặc Thi thử 50 câu, các câu trả lời sai sẽ tự động được lưu tại đây để bạn ôn lại.</p>
+          </div>
+        `;
+        return;
+      }
+
+      btn.classList.remove("opacity-50", "pointer-events-none");
+      container.innerHTML = list.map((item) => {
+        const ansIdx = LETTERS.indexOf(item.ans);
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-rose-200/80 dark:border-rose-900/50 p-5 sm:p-6">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex items-start gap-3">
+                <span class="px-2.5 py-1 rounded-xl bg-rose-600 text-white font-extrabold text-xs shrink-0 mt-0.5">Câu #${item.stt}</span>
+                <h4 class="font-bold text-slate-900 dark:text-white text-base leading-relaxed">${highlightDates(item.q)}</h4>
+              </div>
+              <span class="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-extrabold text-xs shrink-0">Đáp án: ${item.ans}</span>
+            </div>
+            <div class="text-sm text-emerald-900 dark:text-emerald-200 bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-3.5 font-semibold flex items-start gap-2.5">
+              <span>✅</span>
+              <span>${item.ans}. ${highlightDates(item.options[ansIdx] || "")}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function practiceMistakes() {
+      const list = Object.values(mistakesMap);
+      if (list.length === 0) return;
+      startQuiz("mistakes", list);
+    }
+
+    function clearMistakes() {
+      if (confirm("Bạn có chắc muốn xóa toàn bộ danh sách câu sai đã lưu không?")) {
+        mistakesMap = {};
+        saveMistakes();
+        renderMistakes();
+      }
+    }
+
+    // Boot
+    initTheme();
+    updateMistakeCounter();
+    switchMode("study");
+  </script>
+</body>
+</html>
